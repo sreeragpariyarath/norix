@@ -12,7 +12,7 @@
  */
 
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { basename, join } from 'node:path';
+import { basename, isAbsolute, join, relative, resolve } from 'node:path';
 import type { PackageJsonFile, ScanResult } from './types.js';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -71,28 +71,54 @@ function detectLanguage(
   return 'JavaScript';
 }
 
+// ─── Path Safety ──────────────────────────────────────────────────────────────
+
+/**
+ * Ensures a resolved target path strictly resides within the repository root directory.
+ * Prevents path traversal attacks (e.g. workspace patterns containing '../').
+ */
+function isWithinRoot(root: string, targetPath: string): boolean {
+  const resolvedRoot = resolve(root);
+  const resolvedTarget = resolve(targetPath);
+  const rel = relative(resolvedRoot, resolvedTarget);
+  return rel === '' || (!rel.startsWith('..') && !isAbsolute(rel));
+}
+
 // ─── Workspace Resolution ─────────────────────────────────────────────────────
 
 /**
  * Resolves workspace glob patterns (e.g. "packages/*") to package.json paths.
  * Handles simple /* globs and direct paths — covers 95% of real-world usage
  * without requiring an external globbing library.
+ *
+ * Enforces strict root boundaries to prevent path traversal outside the repository.
  */
 function resolveWorkspacePatterns(root: string, patterns: string[]): string[] {
   const results: string[] = [];
+  const resolvedRoot = resolve(root);
 
-  for (const pattern of patterns) {
+  for (const rawPattern of patterns) {
+    if (typeof rawPattern !== 'string') continue;
+    const pattern = rawPattern.trim();
+    if (!pattern || pattern.includes('..')) continue; // Reject path traversal tokens
+
     if (pattern.endsWith('/*') || pattern.endsWith('/**')) {
       // e.g. "packages/*" → scan all subdirectories of packages/
       const dir = pattern.replace(/\/\*+$/, '');
-      const fullDir = join(root, dir);
-      if (!existsSync(fullDir)) continue;
+      const fullDir = join(resolvedRoot, dir);
+
+      if (!isWithinRoot(resolvedRoot, fullDir) || !existsSync(fullDir)) {
+        continue;
+      }
+
       try {
         const entries = readdirSync(fullDir, { withFileTypes: true });
         for (const entry of entries) {
           if (entry.isDirectory()) {
             const pkgPath = join(fullDir, entry.name, 'package.json');
-            if (existsSync(pkgPath)) results.push(pkgPath);
+            if (isWithinRoot(resolvedRoot, pkgPath) && existsSync(pkgPath)) {
+              results.push(pkgPath);
+            }
           }
         }
       } catch {
@@ -100,8 +126,10 @@ function resolveWorkspacePatterns(root: string, patterns: string[]): string[] {
       }
     } else {
       // Direct path — e.g. "packages/ui"
-      const pkgPath = join(root, pattern, 'package.json');
-      if (existsSync(pkgPath)) results.push(pkgPath);
+      const pkgPath = join(resolvedRoot, pattern, 'package.json');
+      if (isWithinRoot(resolvedRoot, pkgPath) && existsSync(pkgPath)) {
+        results.push(pkgPath);
+      }
     }
   }
 
