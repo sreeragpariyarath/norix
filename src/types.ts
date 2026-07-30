@@ -9,7 +9,24 @@ export interface PackageJsonFile {
   workspaces?: string[] | { packages: string[] };
 }
 
+// ─── Capability Database Types ────────────────────────────────────────────────
+
+export interface DbEntry {
+  /** Any of these package names will trigger this capability (OR logic) */
+  packages: string[];
+  /** Human-readable label shown in terminal output */
+  label: string;
+  /**
+   * Sub-type within the capability category.
+   * Doctor only flags overlap when two entries share the same role.
+   */
+  role: string;
+}
+
+export type CapabilityDb = Partial<Record<CapabilityCategory, DbEntry[]>>;
+
 // ─── Capability Categories ────────────────────────────────────────────────────
+
 
 export type CapabilityCategory =
   | 'framework'

@@ -10,7 +10,7 @@
  *  - Order: results follow CATEGORY_ORDER from types.ts
  */
 
-import { DB } from './db.js';
+import { DB } from './db/index.js';
 import type {
   AnalysisResult,
   CapabilityCategory,
