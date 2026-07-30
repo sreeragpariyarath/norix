@@ -1,0 +1,51 @@
+{
+  "name": "norix",
+  "version": "0.5.0",
+  "description": "Repository Intelligence CLI — understand your codebase instantly",
+  "type": "module",
+  "bin": {
+    "norix": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "start": "node dist/index.js",
+    "prepublishOnly": "npm run build"
+  },
+  "tsup": {
+    "entry": ["src/index.ts"],
+    "format": ["esm"],
+    "target": "node18",
+    "clean": true,
+    "banner": {
+      "js": "#!/usr/bin/env node"
+    },
+    "minify": false,
+    "sourcemap": false
+  },
+  "dependencies": {
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "cli",
+    "repository",
+    "intelligence",
+    "analysis",
+    "developer-tools",
+    "codebase",
+    "monorepo"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sreerag/norix"
+  }
+}
