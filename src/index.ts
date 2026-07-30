@@ -221,24 +221,29 @@ async function main(): Promise<void> {
   // ── Command routing ───────────────────────────────────────────────────────
 
   const command = positionals[0] ?? 'analyze';
-  const cwd = values.cwd ? resolve(values.cwd) : process.cwd();
+  const cwd = typeof values.cwd === 'string' ? resolve(values.cwd) : process.cwd();
+  const isJson = Boolean(values.json);
+  const severityStr = typeof values.severity === 'string' ? values.severity : 'all';
+  const formatStr = typeof values.format === 'string' ? values.format : 'all';
+  const outputDir = typeof values.output === 'string' ? resolve(values.output) : cwd;
+  const noDoctor = Boolean(values['no-doctor']);
 
   // Validate severity flag
   if (
     command === 'doctor' &&
-    !['warning', 'info', 'all'].includes(values.severity ?? 'all')
+    !['warning', 'info', 'all'].includes(severityStr)
   ) {
     renderError(
-      `Invalid --severity value: "${values.severity}". Valid values: warning, info, all`,
+      `Invalid --severity value: "${severityStr}". Valid values: warning, info, all`,
     );
     process.exit(2);
   }
 
   // Validate format flag
   const validFormats = ['markdown', 'json', 'all'];
-  if (command === 'report' && !validFormats.includes(values.format ?? 'all')) {
+  if (command === 'report' && !validFormats.includes(formatStr)) {
     renderError(
-      `Invalid --format value: "${values.format}". Valid values: markdown, json, all`,
+      `Invalid --format value: "${formatStr}". Valid values: markdown, json, all`,
     );
     process.exit(2);
   }
@@ -246,21 +251,21 @@ async function main(): Promise<void> {
   try {
     switch (command) {
       case 'analyze': {
-        await cmdAnalyze(cwd, values.json ?? false);
+        await cmdAnalyze(cwd, isJson);
         break;
       }
 
       case 'doctor': {
-        await cmdDoctor(cwd, values.json ?? false, values.severity ?? 'all');
+        await cmdDoctor(cwd, isJson, severityStr);
         break;
       }
 
       case 'report': {
         await cmdReport(
           cwd,
-          (values.format ?? 'all') as ReportFormat,
-          values.output ? resolve(values.output) : cwd,
-          !(values['no-doctor'] ?? false),
+          formatStr as ReportFormat,
+          outputDir,
+          !noDoctor,
         );
         break;
       }
