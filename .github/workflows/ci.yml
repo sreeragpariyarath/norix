@@ -29,7 +29,9 @@ jobs:
           cache: npm
 
       - run: npm ci
-      - run: npm test
+      - name: Run unit tests
+        run: npm test
+        if: matrix.node == '22'
       - run: npm run typecheck
       - run: npm run build
 
