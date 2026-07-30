@@ -12,8 +12,8 @@
  */
 
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { basename, isAbsolute, join, relative, resolve } from 'node:path';
-import type { PackageJsonFile, ScanResult } from './types.js';
+import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path';
+import type { PackageJsonFile, ScanResult, WorkspaceInfo } from './types.js';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -188,13 +188,22 @@ function parsePnpmWorkspaceYaml(root: string): string[] | null {
   }
 }
 
+function extractPackageMap(
+  pkg: PackageJsonFile,
+): Map<string, { version: string; isDev: boolean }> {
+  const map = new Map<string, { version: string; isDev: boolean }>();
+  mergePackages(map, pkg);
+  return map;
+}
+
 // ─── Main Scanner ─────────────────────────────────────────────────────────────
 
 export async function scan(root: string): Promise<ScanResult> {
   const start = performance.now();
+  const resolvedRoot = resolve(root);
 
   // 1. Validate root has a package.json
-  const rootPkgPath = join(root, 'package.json');
+  const rootPkgPath = join(resolvedRoot, 'package.json');
   if (!existsSync(rootPkgPath)) {
     throw new Error(
       `No package.json found in ${root}\n  Make sure you are inside a Node.js repository.`,
@@ -212,13 +221,21 @@ export async function scan(root: string): Promise<ScanResult> {
 
   let isMonorepo = false;
   const workspaceNames: string[] = [];
+  const workspaces: WorkspaceInfo[] = [];
   let packageJsonCount = 1;
+
+  // Add primary root workspace entry
+  workspaces.push({
+    name: rootPkg.name ?? basename(resolvedRoot),
+    relativePath: '.',
+    packages: extractPackageMap(rootPkg),
+  });
 
   // 3. Detect workspace configuration
   let workspacePatterns: string[] | null = null;
 
   // Priority 1: pnpm-workspace.yaml
-  workspacePatterns = parsePnpmWorkspaceYaml(root);
+  workspacePatterns = parsePnpmWorkspaceYaml(resolvedRoot);
 
   // Priority 2: package.json workspaces field (npm/yarn)
   if (!workspacePatterns && rootPkg.workspaces) {
@@ -230,9 +247,9 @@ export async function scan(root: string): Promise<ScanResult> {
   // Priority 3: turbo.json / nx.json presence (monorepo without workspace config)
   if (!workspacePatterns) {
     if (
-      existsSync(join(root, 'turbo.json')) ||
-      existsSync(join(root, 'nx.json')) ||
-      existsSync(join(root, 'lerna.json'))
+      existsSync(join(resolvedRoot, 'turbo.json')) ||
+      existsSync(join(resolvedRoot, 'nx.json')) ||
+      existsSync(join(resolvedRoot, 'lerna.json'))
     ) {
       isMonorepo = true;
     }
@@ -241,28 +258,38 @@ export async function scan(root: string): Promise<ScanResult> {
   // 4. If workspace patterns found, scan all workspace packages
   if (workspacePatterns && workspacePatterns.length > 0) {
     isMonorepo = true;
-    const workspacePkgPaths = resolveWorkspacePatterns(root, workspacePatterns);
+    const workspacePkgPaths = resolveWorkspacePatterns(resolvedRoot, workspacePatterns);
 
     for (const pkgPath of workspacePkgPaths) {
       const pkg = readJson<PackageJsonFile>(pkgPath);
       if (!pkg) continue;
       packageJsonCount++;
+      const dirPath = dirname(pkgPath);
+      const wsName = pkg.name ?? basename(dirPath);
       if (pkg.name) workspaceNames.push(pkg.name);
+
+      workspaces.push({
+        name: wsName,
+        relativePath: relative(resolvedRoot, dirPath),
+        packages: extractPackageMap(pkg),
+      });
+
       mergePackages(allPackages, pkg);
     }
   }
 
   // 5. Detect environment
-  const packageManager = detectPackageManager(root);
-  const language = detectLanguage(root, allPackages);
-  const repoName = rootPkg.name ?? basename(root);
+  const packageManager = detectPackageManager(resolvedRoot);
+  const language = detectLanguage(resolvedRoot, allPackages);
+  const repoName = rootPkg.name ?? basename(resolvedRoot);
   const duration = performance.now() - start;
 
   return {
     repoName,
-    repoRoot: root,
+    repoRoot: resolvedRoot,
     isMonorepo,
     workspaceNames,
+    workspaces,
     allPackages,
     language,
     packageManager,

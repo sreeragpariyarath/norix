@@ -104,13 +104,26 @@ export interface CapabilityMatch {
   role: string;
 }
 
+// ─── Workspace Metadata Types ──────────────────────────────────────────────────
+
+export interface WorkspaceInfo {
+  /** Workspace package name from package.json (or folder basename) */
+  name: string;
+  /** Relative path from repository root (e.g. "packages/ui") */
+  relativePath: string;
+  /** Installed packages specific to this workspace */
+  packages: Map<string, { version: string; isDev: boolean }>;
+}
+
 /** Raw output from the file system scanner */
 export interface ScanResult {
   repoName: string;
   repoRoot: string;
   isMonorepo: boolean;
   workspaceNames: string[];
-  /** All installed packages (deps + devDeps) across all workspaces */
+  /** Detailed per-workspace metadata and package ownership */
+  workspaces: WorkspaceInfo[];
+  /** All installed packages (deps + devDeps) aggregated across all workspaces */
   allPackages: Map<string, { version: string; isDev: boolean }>;
   language: string;
   packageManager: string;

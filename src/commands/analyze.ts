@@ -20,6 +20,11 @@ function toJson(result: AnalysisResult, version: string): unknown {
       root: result.repoRoot,
       isMonorepo: result.isMonorepo,
       workspaces: result.workspaceNames,
+      workspaceDetails: result.workspaces.map((w) => ({
+        name: w.name,
+        path: w.relativePath,
+        packageCount: w.packages.size,
+      })),
       language: result.language,
       packageManager: result.packageManager,
     },
