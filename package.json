@@ -46,9 +46,14 @@
     "codebase",
     "monorepo"
   ],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sreerag/norix"
+    "url": "git+https://github.com/sreeragpariyarath/norix.git"
   }
 }
