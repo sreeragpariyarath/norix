@@ -11,9 +11,9 @@
 ## Install
 
 ```bash
-npm install -g norix
+npm install -g @sreeragpariyarath/norix
 # or
-npx norix analyze
+npx @sreeragpariyarath/norix analyze
 ```
 
 ## Usage
