@@ -26,7 +26,7 @@ norix analyze
 ### Example Output
 
 ```
-  norix  ·  Repository Intelligence  ·  v0.5.0
+  norix  ·  Repository Intelligence  ·  v1.0.0
 
   ────────────────────────────────────────────────────
   Repository     my-app

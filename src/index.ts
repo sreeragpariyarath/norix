@@ -8,7 +8,7 @@ import { handleAnalyze, handleDoctor, handleReport } from './commands/index.js';
 import { renderError } from './renderer.js';
 import type { ReportFormat } from './types.js';
 
-const VERSION = '0.5.0';
+const VERSION = '1.0.0';
 
 const HELP = `
   norix — Repository Intelligence CLI  (v${VERSION})

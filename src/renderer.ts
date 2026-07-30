@@ -103,7 +103,7 @@ export function renderAnalysis(result: AnalysisResult): void {
   lines.push('');
   lines.push(
     indent(
-      `${pc.cyan(pc.bold('norix'))}  ${pc.dim('·  Repository Intelligence  ·  v0.5.0')}`,
+      `${pc.cyan(pc.bold('norix'))}  ${pc.dim('·  Repository Intelligence  ·  v1.0.0')}`,
     ),
   );
   lines.push('');
@@ -183,7 +183,7 @@ export function renderDoctor(result: AnalysisResult, doctor: DoctorResult): void
   lines.push('');
   lines.push(
     indent(
-      `${pc.cyan(pc.bold('norix'))}  ${pc.dim('·  Repository Health  ·  v0.5.0')}`,
+      `${pc.cyan(pc.bold('norix'))}  ${pc.dim('·  Repository Health  ·  v1.0.0')}`,
     ),
   );
   lines.push('');
