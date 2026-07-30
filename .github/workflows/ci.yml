@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  # ── Job 1: Build on multiple Node versions ──────────────────────────────────
+  build:
+    name: Build · Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ["18", "20", "22"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+
+  # ── Job 2: TypeScript version compatibility ─────────────────────────────────
+  typecheck:
+    name: TypeScript ${{ matrix.typescript }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        typescript: ["5.4", "5.5", "latest"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      # Install the specific TypeScript version and verify type-correctness
+      - run: npm install --save-dev typescript@${{ matrix.typescript }}
+      - run: npm run typecheck
+
+  # ── Job 3: Cross-platform smoke tests ──────────────────────────────────────
+  # Verifies the compiled CLI actually runs on each OS and produces
+  # valid output — catches path separator bugs, shebang issues, etc.
+  smoke:
+    name: Smoke Tests · ${{ matrix.os }} · Node ${{ matrix.node }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node: ["18", "22"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      # Run every command against the repo itself and verify exit 0
+      - name: norix --version
+        run: node dist/index.js --version
+
+      - name: norix analyze (terminal)
+        run: node dist/index.js analyze
+
+      - name: norix analyze (json)
+        run: node dist/index.js analyze --json
+
+      - name: norix doctor (terminal)
+        run: node dist/index.js doctor
+
+      - name: norix doctor (json)
+        run: node dist/index.js doctor --json
+
+      - name: norix report (all formats)
+        run: node dist/index.js report --format all --output .
+
+      # Verify the generated report files actually exist
+      - name: Verify report files exist
+        shell: bash
+        run: |
+          test -f norix-report.md  && echo "✓ norix-report.md exists"
+          test -f norix-report.json && echo "✓ norix-report.json exists"
