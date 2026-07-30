@@ -74,11 +74,15 @@ function detectLanguage(
 // ─── Path Safety ──────────────────────────────────────────────────────────────
 
 /**
- * Ensures a resolved target path strictly resides within the repository root directory.
- * Prevents path traversal attacks (e.g. workspace patterns containing '../').
+ * Guarantees that `targetPath` strictly resides inside `resolvedRoot`.
+ *
+ * Uses `node:path` relative calculation: returns `true` if and only if the path
+ * from `resolvedRoot` to `targetPath` does not start with `..` and is not absolute.
+ *
+ * @param resolvedRoot Pre-resolved, absolute path to the repository root.
+ * @param targetPath Path to test for root boundary containment.
  */
-function isWithinRoot(root: string, targetPath: string): boolean {
-  const resolvedRoot = resolve(root);
+function isPathWithinRoot(resolvedRoot: string, targetPath: string): boolean {
   const resolvedTarget = resolve(targetPath);
   const rel = relative(resolvedRoot, resolvedTarget);
   return rel === '' || (!rel.startsWith('..') && !isAbsolute(rel));
@@ -91,7 +95,8 @@ function isWithinRoot(root: string, targetPath: string): boolean {
  * Handles simple /* globs and direct paths — covers 95% of real-world usage
  * without requiring an external globbing library.
  *
- * Enforces strict root boundaries to prevent path traversal outside the repository.
+ * Enforces strict root boundaries using `isPathWithinRoot()` to prevent path
+ * traversal outside the repository.
  */
 function resolveWorkspacePatterns(root: string, patterns: string[]): string[] {
   const results: string[] = [];
@@ -100,14 +105,14 @@ function resolveWorkspacePatterns(root: string, patterns: string[]): string[] {
   for (const rawPattern of patterns) {
     if (typeof rawPattern !== 'string') continue;
     const pattern = rawPattern.trim();
-    if (!pattern || pattern.includes('..')) continue; // Reject path traversal tokens
+    if (!pattern) continue;
 
     if (pattern.endsWith('/*') || pattern.endsWith('/**')) {
       // e.g. "packages/*" → scan all subdirectories of packages/
       const dir = pattern.replace(/\/\*+$/, '');
       const fullDir = join(resolvedRoot, dir);
 
-      if (!isWithinRoot(resolvedRoot, fullDir) || !existsSync(fullDir)) {
+      if (!isPathWithinRoot(resolvedRoot, fullDir) || !existsSync(fullDir)) {
         continue;
       }
 
@@ -116,7 +121,7 @@ function resolveWorkspacePatterns(root: string, patterns: string[]): string[] {
         for (const entry of entries) {
           if (entry.isDirectory()) {
             const pkgPath = join(fullDir, entry.name, 'package.json');
-            if (isWithinRoot(resolvedRoot, pkgPath) && existsSync(pkgPath)) {
+            if (isPathWithinRoot(resolvedRoot, pkgPath) && existsSync(pkgPath)) {
               results.push(pkgPath);
             }
           }
@@ -127,7 +132,7 @@ function resolveWorkspacePatterns(root: string, patterns: string[]): string[] {
     } else {
       // Direct path — e.g. "packages/ui"
       const pkgPath = join(resolvedRoot, pattern, 'package.json');
-      if (isWithinRoot(resolvedRoot, pkgPath) && existsSync(pkgPath)) {
+      if (isPathWithinRoot(resolvedRoot, pkgPath) && existsSync(pkgPath)) {
         results.push(pkgPath);
       }
     }
