@@ -1,5 +1,5 @@
 {
-  "name": "@sreeragp/norix",
+  "name": "norix-cli",
   "version": "0.5.0",
   "description": "Repository Intelligence CLI — understand your codebase instantly",
   "type": "module",
