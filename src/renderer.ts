@@ -5,10 +5,9 @@
  * beautiful terminal output.
  *
  * Design decisions:
+ *  - Dynamic column width calculation based on maximum label length
  *  - Single runtime dependency: picocolors (500 bytes)
- *  - No external box-drawing libraries — hand-crafted with Unicode chars
- *  - analyze: multiple detections in one category → highlighted yellow
- *  - doctor: ⚠ yellow for warnings, ℹ cyan for info
+ *  - No heavy box-drawing libraries — hand-crafted Unicode layout
  *  - Non-TTY safe: colors auto-disabled when piped (picocolors handles this)
  */
 
@@ -21,11 +20,10 @@ import type {
 } from './types.js';
 import { CATEGORY_LABELS, CATEGORY_ORDER } from './types.js';
 
-// ─── Layout Constants ─────────────────────────────────────────────────────────
+// ─── Formatting Constants ─────────────────────────────────────────────────────
 
-const LABEL_WIDTH = 14;
-const RULE_WIDTH = 52;
-const REASONING_WIDTH = 50;
+const DEFAULT_LABEL_WIDTH = 14;
+const DEFAULT_RULE_WIDTH = 52;
 const REASONING_INDENT = '     ';
 
 // ─── Shared Helpers ───────────────────────────────────────────────────────────
@@ -38,8 +36,8 @@ function padRight(str: string, len: number): string {
   return str + ' '.repeat(Math.max(0, len - str.length));
 }
 
-function rule(): string {
-  return indent(pc.dim('─'.repeat(RULE_WIDTH)));
+function rule(width = DEFAULT_RULE_WIDTH): string {
+  return indent(pc.dim('─'.repeat(width)));
 }
 
 function formatDuration(ms: number): string {
@@ -47,8 +45,21 @@ function formatDuration(ms: number): string {
   return `${(ms / 1000).toFixed(1)}s`;
 }
 
-function row(label: string, value: string): string {
-  return indent(`${pc.dim(padRight(label, LABEL_WIDTH))} ${value}`);
+function row(label: string, value: string, labelWidth: number): string {
+  return indent(`${pc.dim(padRight(label, labelWidth))} ${value}`);
+}
+
+function categoryTitle(category: string): string {
+  const map: Record<string, string> = {
+    httpClient: 'HTTP Client',
+    dateUtility: 'Date Utility',
+    packageManager: 'Package Manager',
+    orm: 'ORM',
+  };
+  return (
+    map[category] ??
+    category.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase())
+  );
 }
 
 /**
@@ -76,6 +87,18 @@ function wordWrap(text: string, width: number, lineIndent: string): string[] {
 export function renderAnalysis(result: AnalysisResult): void {
   const lines: string[] = [];
 
+  // Compute dynamic label padding width
+  const activeCategories = CATEGORY_ORDER.filter(
+    (cat) => (result.capabilities[cat]?.length ?? 0) > 0,
+  );
+
+  const maxLabelLen = activeCategories.reduce((max, cat) => {
+    const label = CATEGORY_LABELS[cat as CapabilityCategory] ?? cat;
+    return Math.max(max, label.length);
+  }, DEFAULT_LABEL_WIDTH);
+
+  const labelWidth = Math.max(DEFAULT_LABEL_WIDTH, maxLabelLen + 2);
+
   // ── Header ──────────────────────────────────────────────────────────────
   lines.push('');
   lines.push(
@@ -88,11 +111,11 @@ export function renderAnalysis(result: AnalysisResult): void {
 
   // ── Repository metadata ─────────────────────────────────────────────────
   lines.push('');
-  lines.push(row('Repository', pc.bold(pc.white(result.repoName))));
-  lines.push(row('Language', pc.white(result.language)));
+  lines.push(row('Repository', pc.bold(pc.white(result.repoName)), labelWidth));
+  lines.push(row('Language', pc.white(result.language), labelWidth));
 
   if (result.packageManager !== 'unknown') {
-    lines.push(row('Package Mgr', pc.white(result.packageManager)));
+    lines.push(row('Package Mgr', pc.white(result.packageManager), labelWidth));
   }
 
   if (result.isMonorepo) {
@@ -101,7 +124,7 @@ export function renderAnalysis(result: AnalysisResult): void {
       wsCount > 0
         ? `Monorepo  ${pc.dim(`(${wsCount} workspaces)`)}`
         : 'Monorepo';
-    lines.push(row('Type', pc.white(wsLabel)));
+    lines.push(row('Type', pc.white(wsLabel), labelWidth));
   }
 
   lines.push('');
@@ -110,29 +133,26 @@ export function renderAnalysis(result: AnalysisResult): void {
   // ── Capabilities ────────────────────────────────────────────────────────
   lines.push('');
 
-  const detectedCategories = CATEGORY_ORDER.filter(
-    (cat) =>
-      result.capabilities[cat] && (result.capabilities[cat]?.length ?? 0) > 0,
-  );
-
-  if (detectedCategories.length === 0) {
+  if (activeCategories.length === 0) {
     lines.push(indent(pc.dim('  No known capabilities detected.')));
     lines.push(
       indent(pc.dim('  Ensure package.json dependencies are installed.')),
     );
   } else {
-    for (const category of detectedCategories) {
+    for (const category of activeCategories) {
       const matches = result.capabilities[category];
       if (!matches) continue;
 
       const label = CATEGORY_LABELS[category as CapabilityCategory] ?? category;
       const valueText = matches.map((m) => m.label).join(' · ');
 
-      // Yellow highlight if multiple tools in same category (subtle overlap signal)
-      const valueRendered =
-        matches.length > 1 ? pc.yellow(valueText) : pc.white(valueText);
+      // Yellow highlight if multiple tools share the same role
+      const hasOverlap = matches.length > 1;
+      const valueRendered = hasOverlap
+        ? pc.yellow(valueText)
+        : pc.white(valueText);
 
-      lines.push(row(label, valueRendered));
+      lines.push(row(label, valueRendered, labelWidth));
     }
   }
 
@@ -197,7 +217,7 @@ export function renderDoctor(result: AnalysisResult, doctor: DoctorResult): void
       lines.push('');
 
       // Reasoning (word-wrapped)
-      const wrapped = wordWrap(finding.reasoning, REASONING_WIDTH, REASONING_INDENT);
+      const wrapped = wordWrap(finding.reasoning, 50, REASONING_INDENT);
       for (const line of wrapped) {
         lines.push(indent(pc.dim(line)));
       }
@@ -264,23 +284,8 @@ export function renderReportSuccess(report: GeneratedReport): void {
   process.stdout.write(lines.join('\n') + '\n');
 }
 
-// ─── Error / Warning helpers ──────────────────────────────────────────────────
+// ─── Error / Warning Helpers ──────────────────────────────────────────────────
 
 export function renderError(message: string): void {
   process.stderr.write(`\n  ${pc.red('✖')}  ${pc.white(message)}\n\n`);
-}
-
-// ─── Private Utilities ────────────────────────────────────────────────────────
-
-function categoryTitle(category: string): string {
-  const map: Record<string, string> = {
-    httpClient: 'HTTP Client',
-    dateUtility: 'Date Utility',
-    packageManager: 'Package Manager',
-    orm: 'ORM',
-  };
-  return (
-    map[category] ??
-    category.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase())
-  );
 }
