@@ -143,7 +143,7 @@ No judgements. No errors. Just information.
 ## Development
 
 ```bash
-git clone https://github.com/sreerag/norix
+git clone https://github.com/sreeragpariyarath/norix.git
 cd norix
 npm install
 npm run build
@@ -157,8 +157,8 @@ node dist/index.js analyze
 ## Roadmap
 
 - [x] `norix analyze` — repository overview
-- [ ] `norix doctor` — capability overlap detection
-- [ ] `norix report` — Markdown + JSON reports
+- [x] `norix doctor` — capability overlap detection
+- [x] `norix report` — Markdown + JSON reports
 - [ ] Plugin system
 - [ ] GitHub Action
 - [ ] MCP server
