@@ -1,26 +1,14 @@
 /**
- * Norix CLI Entry Point — Phase 1
- *
- * Commands:
- *   norix analyze   — repository overview
- *   norix doctor    — capability health check
- *   norix report    — generate Markdown + JSON reports
+ * Norix CLI Entry Point — Routing & Flag Parsing
  */
 
 import { parseArgs } from 'node:util';
 import { resolve } from 'node:path';
-import { scan } from './scanner.js';
-import { analyze } from './analyzer.js';
-import { runDoctor } from './doctor.js';
-import { writeReports } from './report.js';
-import { renderAnalysis, renderDoctor, renderError, renderReportSuccess } from './renderer.js';
-import type { AnalysisResult, ReportFormat } from './types.js';
-
-// ─── Version ──────────────────────────────────────────────────────────────────
+import { handleAnalyze, handleDoctor, handleReport } from './commands/index.js';
+import { renderError } from './renderer.js';
+import type { ReportFormat } from './types.js';
 
 const VERSION = '0.5.0';
-
-// ─── Help Text ────────────────────────────────────────────────────────────────
 
 const HELP = `
   norix — Repository Intelligence CLI  (v${VERSION})
@@ -61,143 +49,15 @@ const HELP = `
     norix report --format markdown --output ./docs
 `;
 
-// ─── Shared: Run Scan + Analyze ───────────────────────────────────────────────
-
-async function runScanAndAnalyze(cwd: string): Promise<AnalysisResult> {
-  const scanResult = await scan(cwd);
-  return analyze(scanResult);
-}
-
-// ─── JSON Serializers ─────────────────────────────────────────────────────────
-
-function analyzeToJson(result: AnalysisResult): unknown {
-  return {
-    $schema: 'https://norix.dev/schemas/analyze/v1.json',
-    version: '1',
-    norixVersion: VERSION,
-    timestamp: new Date().toISOString(),
-    repository: {
-      name: result.repoName,
-      root: result.repoRoot,
-      isMonorepo: result.isMonorepo,
-      workspaces: result.workspaceNames,
-      language: result.language,
-      packageManager: result.packageManager,
-    },
-    capabilities: result.capabilities,
-    meta: {
-      packageJsonCount: result.packageJsonCount,
-      durationMs: Math.round(result.duration),
-    },
-  };
-}
-
-function doctorToJson(
-  analysis: AnalysisResult,
-  doctor: import('./types.js').DoctorResult,
-): unknown {
-  return {
-    $schema: 'https://norix.dev/schemas/doctor/v1.json',
-    version: '1',
-    norixVersion: VERSION,
-    timestamp: new Date().toISOString(),
-    repository: {
-      name: analysis.repoName,
-      isMonorepo: analysis.isMonorepo,
-      language: analysis.language,
-      packageManager: analysis.packageManager,
-    },
-    findings: doctor.findings,
-    summary: doctor.summary,
-    meta: {
-      durationMs: Math.round(analysis.duration + doctor.duration),
-    },
-  };
-}
-
-// ─── Command Handlers ─────────────────────────────────────────────────────────
-
-async function cmdAnalyze(cwd: string, asJson: boolean): Promise<void> {
-  const result = await runScanAndAnalyze(cwd);
-  if (asJson) {
-    process.stdout.write(JSON.stringify(analyzeToJson(result), null, 2) + '\n');
-  } else {
-    renderAnalysis(result);
-  }
-}
-
-async function cmdDoctor(
-  cwd: string,
-  asJson: boolean,
-  severity: string,
-): Promise<void> {
-  const analysis = await runScanAndAnalyze(cwd);
-  const doctor = runDoctor(analysis);
-
-  // Apply severity filter
-  const filtered = {
-    ...doctor,
-    findings:
-      severity === 'all'
-        ? doctor.findings
-        : doctor.findings.filter((f) => f.severity === severity),
-    summary: {
-      total: 0,
-      warning: 0,
-      info: 0,
-    },
-  };
-
-  filtered.summary.total = filtered.findings.length;
-  filtered.summary.warning = filtered.findings.filter(
-    (f) => f.severity === 'warning',
-  ).length;
-  filtered.summary.info = filtered.findings.filter(
-    (f) => f.severity === 'info',
-  ).length;
-
-  if (asJson) {
-    process.stdout.write(
-      JSON.stringify(doctorToJson(analysis, filtered), null, 2) + '\n',
-    );
-  } else {
-    renderDoctor(analysis, filtered);
-  }
-}
-
-async function cmdReport(
-  cwd: string,
-  format: ReportFormat,
-  outputDir: string,
-  includeDoctor: boolean,
-): Promise<void> {
-  const analysis = await runScanAndAnalyze(cwd);
-  const doctor = includeDoctor ? runDoctor(analysis) : null;
-
-  const report = writeReports(
-    { format, outputDir, includeDoctor },
-    analysis,
-    doctor,
-  );
-
-  renderReportSuccess(report);
-}
-
-// ─── Main ─────────────────────────────────────────────────────────────────────
-
 async function main(): Promise<void> {
   const { values, positionals } = parseArgs({
     args: process.argv.slice(2),
     options: {
-      // Global
       cwd: { type: 'string', short: 'c' },
       version: { type: 'boolean', short: 'v', default: false },
       help: { type: 'boolean', short: 'h', default: false },
-      // analyze + doctor
       json: { type: 'boolean', default: false },
-      // doctor
       severity: { type: 'string', default: 'all' },
-      // report
       format: { type: 'string', default: 'all' },
       output: { type: 'string', short: 'o' },
       'no-doctor': { type: 'boolean', default: false },
@@ -205,8 +65,6 @@ async function main(): Promise<void> {
     allowPositionals: true,
     strict: false,
   });
-
-  // ── Global flags ─────────────────────────────────────────────────────────
 
   if (values.version) {
     process.stdout.write(`${VERSION}\n`);
@@ -218,8 +76,6 @@ async function main(): Promise<void> {
     process.exit(0);
   }
 
-  // ── Command routing ───────────────────────────────────────────────────────
-
   const command = positionals[0] ?? 'analyze';
   const cwd = typeof values.cwd === 'string' ? resolve(values.cwd) : process.cwd();
   const isJson = Boolean(values.json);
@@ -228,7 +84,6 @@ async function main(): Promise<void> {
   const outputDir = typeof values.output === 'string' ? resolve(values.output) : cwd;
   const noDoctor = Boolean(values['no-doctor']);
 
-  // Validate severity flag
   if (
     command === 'doctor' &&
     !['warning', 'info', 'all'].includes(severityStr)
@@ -239,7 +94,6 @@ async function main(): Promise<void> {
     process.exit(2);
   }
 
-  // Validate format flag
   const validFormats = ['markdown', 'json', 'all'];
   if (command === 'report' && !validFormats.includes(formatStr)) {
     renderError(
@@ -251,17 +105,17 @@ async function main(): Promise<void> {
   try {
     switch (command) {
       case 'analyze': {
-        await cmdAnalyze(cwd, isJson);
+        await handleAnalyze(cwd, isJson, VERSION);
         break;
       }
 
       case 'doctor': {
-        await cmdDoctor(cwd, isJson, severityStr);
+        await handleDoctor(cwd, isJson, severityStr, VERSION);
         break;
       }
 
       case 'report': {
-        await cmdReport(
+        await handleReport(
           cwd,
           formatStr as ReportFormat,
           outputDir,
