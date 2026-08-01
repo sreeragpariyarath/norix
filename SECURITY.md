@@ -9,7 +9,7 @@ If you discover a security vulnerability or security-related issue in Norix, ple
 ### How to Report
 
 - **Do NOT open a public GitHub issue.**
-- Send an email to the project maintainer with details regarding the issue and steps to reproduce.
+- Send an email to the project maintainer at [psreerag69@gmail.com](mailto:psreerag69@gmail.com) with details regarding the issue and steps to reproduce.
 
 ### Response Time
 

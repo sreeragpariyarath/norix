@@ -1,7 +1,7 @@
 {
   "name": "norix-cli",
   "version": "1.0.0",
-  "description": "Repository Intelligence CLI — understand your codebase instantly",
+  "description": "Repository Analysis CLI — understand your codebase instantly",
   "type": "module",
   "bin": {
     "norix": "./dist/index.js"
@@ -46,7 +46,6 @@
   "keywords": [
     "cli",
     "repository",
-    "intelligence",
     "analysis",
     "developer-tools",
     "codebase",

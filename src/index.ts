@@ -11,7 +11,7 @@ import type { ReportFormat } from './types.js';
 const VERSION = '1.0.0';
 
 const HELP = `
-  norix — Repository Intelligence CLI  (v${VERSION})
+  norix — Repository Analysis CLI  (v${VERSION})
 
   Usage:
     norix <command> [options]

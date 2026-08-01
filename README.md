@@ -1,32 +1,35 @@
 # norix
 
-> Repository Intelligence CLI — understand your codebase instantly.
+Repository Analysis CLI — understand your codebase instantly.
 
-`norix` scans your repository and tells you exactly what technologies, frameworks, and capabilities it uses.
+[![npm version](https://img.shields.io/npm/v/norix-cli.svg)](https://www.npmjs.com/package/norix-cli)
+[![npm downloads](https://img.shields.io/npm/dm/norix-cli.svg)](https://www.npmjs.com/package/norix-cli)
+[![license](https://img.shields.io/npm/l/norix-cli.svg)](https://github.com/sreeragpariyarath/norix/blob/main/LICENSE)
 
-**No AI. No network. No nonsense.**
+Norix is a repository analysis CLI for Node.js projects.
 
----
+It analyzes your workspace to identify frameworks, tooling, libraries, and project capabilities—entirely offline and without reading application source code.
 
-## Install
+> No AI. No network. No nonsense.
+
+## Project Status
+
+Norix is stable and actively maintained. The CLI is production-ready for repository analysis, with additional capabilities planned in future releases.
+
+## Quick Start
+
+Run `norix` instantly without installation using `npx`:
 
 ```bash
-npm install -g norix-cli
-# or
-npx norix-cli analyze
+npx norix-cli
 ```
 
-## Usage
+*By default, this analyzes the current working directory.*
 
-```bash
-# Run inside any Node.js repository
-norix analyze
-```
-
-### Example Output
+## Example Output
 
 ```
-  norix  ·  Repository Intelligence  ·  v1.0.0
+  norix  ·  Repository Analysis  ·  v1.0.0
 
   ────────────────────────────────────────────────────
   Repository     my-app
@@ -52,44 +55,80 @@ norix analyze
   3 package.json files scanned  ·  0.3s
 ```
 
----
+## Why Norix
 
-## What It Detects
+When onboarding to a new codebase, auditing a repository, or setting up tooling, you need to quickly understand the project's stack. 
 
-| Category | Examples |
-|---|---|
-| Framework | Next.js, Express, NestJS, Fastify, Hono, Remix, Astro |
-| Database | PostgreSQL, MySQL, MongoDB, SQLite, Supabase, Neon, Turso |
-| ORM | Prisma, Drizzle, TypeORM, Sequelize, Mongoose, Kysely |
-| Validation | Zod, Yup, Joi, Valibot, class-validator, ArkType |
-| Auth | Auth.js, Clerk, Lucia, Better Auth, Passport.js |
-| Cache | Redis, ioredis, Upstash Redis, LRU Cache |
-| Queue | BullMQ, pg-boss, Kafka, Inngest, Trigger.dev |
-| Storage | AWS S3, Cloudinary, UploadThing, Vercel Blob |
-| Email | Resend, Nodemailer, SendGrid, React Email |
-| Payments | Stripe, Lemon Squeezy, Razorpay, PayPal |
-| Testing | Vitest, Jest, Playwright, Cypress, Testing Library |
-| HTTP Client | Axios, Got, ky, undici |
-| Date | date-fns, Day.js, Moment.js, Luxon |
-| Logging | Pino, Winston, Consola |
-| Docs | Storybook, VitePress, Docusaurus, TypeDoc |
-| Build | Vite, Webpack, esbuild, Turborepo, Nx |
+Traditional approaches require either manual inspection of dependency files or sharing code with remote API endpoints. `norix` solves this locally and instantly with zero configuration. It parses package definitions and metadata, compares them against a built-in technology registry, and outputs a clear hierarchy of the project's capabilities.
 
----
+## Features
 
-## Options
+- **Stack Identification**: Automatically map packages to their roles (e.g. Next.js under Framework, Prisma under ORM, Zod under Validation).
+- **Capability Overlaps**: Flags when competing libraries are used for the same purpose (e.g. having both `axios` and `got` installed) to help you keep dependencies clean.
+- **Monorepo Detection**: Works out of the box with `npm`/`yarn`/`pnpm` workspaces, Turborepo, Nx, and Lerna.
+- **Offline & Private**: Never accesses the network, makes no API calls, and processes everything locally.
+- **Machine-Readable Exports**: Generates clean JSON and Markdown reports for continuous integration, auditing, or codebase documentation.
 
+## Installation
+
+Install `norix` globally using your preferred package manager:
+
+```bash
+npm install -g norix-cli
+# or
+pnpm add -g norix-cli
+# or
+yarn global add norix-cli
 ```
+
+## Usage
+
+`norix` provides three main commands: `analyze`, `doctor`, and `report`.
+
+### 1. Analyze the Stack
+Shows the high-level repository overview and detected capabilities.
+```bash
 norix analyze [options]
-
-Options:
-  --cwd <path>   Target directory  (default: current directory)
-  --json         Output as JSON
-  --version      Show version
-  --help         Show help
 ```
+
+### 2. Check Repository Health
+Scans the project for potential capability overlaps (e.g. multiple loggers or HTTP clients).
+```bash
+norix doctor [options]
+```
+
+### 3. Generate Reports
+Export the analysis results to Markdown or JSON formats for documentation or automated tooling.
+```bash
+norix report [options]
+```
+
+## Supported Technologies
+
+`norix` recognizes a broad set of tools across different categories:
+
+| Category | Examples / Supported Packages |
+| :--- | :--- |
+| **Framework** | Next.js, Express, NestJS, Fastify, Hono, Remix, Astro, SvelteKit, Elysia, React, Vue, Angular |
+| **Database** | PostgreSQL, MySQL, MongoDB, SQLite, Supabase, Neon, Turso |
+| **ORM** | Prisma, Drizzle, TypeORM, Sequelize, Mongoose, Kysely |
+| **Validation** | Zod, Yup, Joi, Valibot, class-validator, ArkType |
+| **Auth** | Auth.js, Clerk, Lucia, Better Auth, Passport.js |
+| **Cache** | Redis, ioredis, Upstash Redis, LRU Cache |
+| **Queue** | BullMQ, pg-boss, Kafka, Inngest, Trigger.dev |
+| **Storage** | AWS S3, Cloudinary, UploadThing, Vercel Blob |
+| **Email** | Resend, Nodemailer, SendGrid, React Email |
+| **Payments** | Stripe, Lemon Squeezy, Razorpay, PayPal |
+| **Testing** | Vitest, Jest, Playwright, Cypress, Testing Library |
+| **HTTP Client** | Axios, Got, ky, undici |
+| **Date** | date-fns, Day.js, Moment.js, Luxon |
+| **Logging** | Pino, Winston, Consola |
+| **Docs** | Storybook, VitePress, Docusaurus, TypeDoc |
+| **Build** | Vite, Webpack, esbuild, Turborepo, Nx |
 
 ## JSON Output
+
+Generate machine-readable outputs for custom integrations or CI scripts:
 
 ```bash
 norix analyze --json
@@ -98,8 +137,8 @@ norix analyze --json
 ```json
 {
   "version": "1",
-  "norixVersion": "0.5.0",
-  "timestamp": "2025-01-01T10:00:00Z",
+  "norixVersion": "1.0.0",
+  "timestamp": "2026-08-01T10:00:00Z",
   "repository": {
     "name": "my-app",
     "isMonorepo": true,
@@ -108,9 +147,9 @@ norix analyze --json
     "packageManager": "pnpm"
   },
   "capabilities": {
-    "framework": [{ "label": "Next.js", "matchedPackages": ["next"] }],
-    "orm": [{ "label": "Prisma", "matchedPackages": ["@prisma/client"] }],
-    "validation": [{ "label": "Zod", "matchedPackages": ["zod"] }]
+    "framework": [{ "label": "Next.js", "matchedPackages": ["next"], "role": "meta-framework" }],
+    "orm": [{ "label": "Prisma", "matchedPackages": ["@prisma/client"], "role": "orm" }],
+    "validation": [{ "label": "Zod", "matchedPackages": ["zod"], "role": "validation" }]
   },
   "meta": {
     "packageJsonCount": 3,
@@ -119,52 +158,73 @@ norix analyze --json
 }
 ```
 
----
-
 ## Monorepo Support
 
-Norix automatically detects and scans:
-- npm/yarn workspaces (`package.json#workspaces`)
-- pnpm workspaces (`pnpm-workspace.yaml`)
-- Turborepo / Nx / Lerna projects
+`norix` detects workspace layouts automatically by scanning for:
+- `package.json` workspaces (`workspaces` array or object)
+- `pnpm-workspace.yaml` files
+- Workspace-level tools (`turbo.json`, `nx.json`, `lerna.json`)
 
-Capabilities are aggregated across **all** workspace packages.
+Capabilities and dependencies are aggregated across all workspace packages, presenting a single cohesive picture of the monorepo's stack.
 
----
+## CLI Options
 
-## Capability Overlaps
+```
+norix <command> [options]
 
-If multiple tools in the same category are detected (e.g. both `axios` and `got`), they appear highlighted in yellow in the terminal output — a subtle signal worth reviewing.
+Commands:
+  analyze          Show repository overview (default)
+  doctor           Show repository health and capability overlaps
+  report           Generate Markdown and JSON reports
 
-No judgements. No errors. Just information.
+Global Options:
+  -c, --cwd <path> Set working directory (default: current directory)
+  -v, --version    Show version number
+  -h, --help       Show help message
 
----
+Command Options:
+  analyze
+    --json         Output as JSON to stdout
+
+  doctor
+    --json         Output findings as JSON to stdout
+    --severity     Filter findings: warning | info | all (default: all)
+
+  report
+    --format       Format to output: markdown | json | all (default: all)
+    --output <dir> Output directory (default: current directory)
+    --no-doctor    Exclude health findings from report
+```
 
 ## Development
 
+Prerequisites: Node.js (>= 18) and a package manager.
+
 ```bash
+# Clone the repository
 git clone https://github.com/sreeragpariyarath/norix.git
 cd norix
+
+# Install dependencies
 npm install
+
+# Build the project
 npm run build
 
-# Test against this repo
+# Run the compiled binary locally against this repo
 node dist/index.js analyze
 ```
 
----
+## Contributing
 
-## Roadmap
+Contributions are welcome! Please open an issue or submit a pull request for improvements or additional library detections.
 
-- [x] `norix analyze` — repository overview
-- [x] `norix doctor` — capability overlap detection
-- [x] `norix report` — Markdown + JSON reports
-- [ ] Plugin system
-- [ ] GitHub Action
-- [ ] MCP server
-
----
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## License
 
-MIT
+[MIT](LICENSE)

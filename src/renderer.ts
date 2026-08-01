@@ -103,7 +103,7 @@ export function renderAnalysis(result: AnalysisResult): void {
   lines.push('');
   lines.push(
     indent(
-      `${pc.cyan(pc.bold('norix'))}  ${pc.dim('·  Repository Intelligence  ·  v1.0.0')}`,
+      `${pc.cyan(pc.bold('norix'))}  ${pc.dim('·  Repository Analysis  ·  v1.0.0')}`,
     ),
   );
   lines.push('');
