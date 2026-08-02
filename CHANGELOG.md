@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.0](https://github.com/sreeragpariyarath/norix/compare/v1.11.0...v1.12.0) (2026-08-02)
+
+
+### Features
+
+* **output:** add multi-format reporting support ([324b814](https://github.com/sreeragpariyarath/norix/commit/324b814c8196caed0f60472e6fab05995d824a8e))
+
 ## [1.11.0](https://github.com/sreeragpariyarath/norix/compare/v1.10.0...v1.11.0) (2026-08-02)
 
 
