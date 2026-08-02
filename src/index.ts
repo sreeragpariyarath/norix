@@ -91,6 +91,21 @@ async function main(): Promise<void> {
     process.exit(2);
   }
 
+  if (command === 'analyze') {
+    const resolvedFormat = values.json
+      ? 'json'
+      : values.format === 'all' || !values.format
+        ? 'summary'
+        : (values.format as string);
+    const validAnalyzeFormats = ['summary', 'json', 'yaml', 'markdown', 'csv', 'sarif'];
+    if (!validAnalyzeFormats.includes(resolvedFormat)) {
+      renderError(
+        `Invalid format value: "${resolvedFormat}". Valid values: summary, json, yaml, markdown, csv, sarif`,
+      );
+      process.exit(2);
+    }
+  }
+
   const validFormats = ['markdown', 'json', 'all'];
   if (command === 'report' && !validFormats.includes(formatStr)) {
     renderError(`Invalid --format value: "${formatStr}". Valid values: markdown, json, all`);
@@ -100,7 +115,12 @@ async function main(): Promise<void> {
   try {
     switch (command) {
       case 'analyze': {
-        await handleAnalyze(cwd, isJson, VERSION, engine);
+        const formatVal = values.json
+          ? 'json'
+          : values.format === 'all' || !values.format
+            ? 'summary'
+            : (values.format as string);
+        await handleAnalyze(cwd, formatVal, VERSION, engine);
         break;
       }
 
