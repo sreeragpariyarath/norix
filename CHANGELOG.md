@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.0](https://github.com/sreeragpariyarath/norix/compare/v1.9.0...v1.10.0) (2026-08-02)
+
+
+### Features
+
+* **engine:** migrate infrastructure capability detectors ([7aba0f4](https://github.com/sreeragpariyarath/norix/commit/7aba0f417d2f9e207f4d381ec9aa887802d3f83d))
+
 ## [1.9.0](https://github.com/sreeragpariyarath/norix/compare/v1.8.0...v1.9.0) (2026-08-02)
 
 
