@@ -234,6 +234,18 @@ npm run build
 node dist/index.js analyze
 ```
 
+## Performance Benchmarking
+
+Norix includes a performance benchmarking suite to measure and analyze execution times, memory usage, cache hit rates, and individual detector efficiency.
+
+To run the benchmarks:
+
+```bash
+npm run benchmark
+```
+
+This compiles the benchmark runner, generates dynamic test workspaces in your OS temp directory, and executes the scan against cold and warm caches. It generates a markdown report detailing the metrics inside `benchmark/results.md` and prints the output to stdout.
+
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request for improvements or additional library detections.

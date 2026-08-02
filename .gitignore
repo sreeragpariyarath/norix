@@ -3,3 +3,4 @@ dist/
 .norix/
 *.log
 .DS_Store
+fixtures/

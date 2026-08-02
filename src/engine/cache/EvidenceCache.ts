@@ -1,3 +1,16 @@
+export interface CacheStatistics {
+  readonly fileHits: number;
+  readonly fileMisses: number;
+  readonly jsonHits: number;
+  readonly jsonMisses: number;
+  readonly yamlHits: number;
+  readonly yamlMisses: number;
+  readonly regexHits: number;
+  readonly regexMisses: number;
+  readonly contentHits: number;
+  readonly contentMisses: number;
+}
+
 /**
  * A generic, in-memory caching layer that avoids redundant filesystem operations,
  * file reading, file parsing, and pattern matching inside the detection engine.
@@ -13,6 +26,26 @@ export class EvidenceCache {
   private yaml = new Map<string, unknown>();
   private regexMatches = new Map<string, boolean>();
 
+  private stats = {
+    fileHits: 0,
+    fileMisses: 0,
+    jsonHits: 0,
+    jsonMisses: 0,
+    yamlHits: 0,
+    yamlMisses: 0,
+    regexHits: 0,
+    regexMisses: 0,
+    contentHits: 0,
+    contentMisses: 0,
+  };
+
+  /**
+   * Retrieves a read-only snapshot of the cache execution statistics.
+   */
+  getStatistics(): CacheStatistics {
+    return Object.freeze({ ...this.stats });
+  }
+
   /**
    * Checks if a file exists, caching the result.
    *
@@ -23,8 +56,11 @@ export class EvidenceCache {
   hasFile(path: string, resolver: () => boolean): boolean {
     let exists = this.existence.get(path);
     if (exists === undefined) {
+      this.stats.fileMisses++;
       exists = resolver();
       this.existence.set(path, exists);
+    } else {
+      this.stats.fileHits++;
     }
     return exists;
   }
@@ -43,11 +79,14 @@ export class EvidenceCache {
   getFileContent(path: string, resolver: () => Promise<string | null>): Promise<string | null> {
     let promise = this.contents.get(path);
     if (!promise) {
+      this.stats.contentMisses++;
       promise = resolver().catch((error) => {
         this.contents.delete(path);
         throw error;
       });
       this.contents.set(path, promise);
+    } else {
+      this.stats.contentHits++;
     }
     return promise;
   }
@@ -62,8 +101,11 @@ export class EvidenceCache {
   getJson<T>(path: string, resolver: () => T): T {
     let data = this.json.get(path);
     if (data === undefined) {
+      this.stats.jsonMisses++;
       data = resolver();
       this.json.set(path, data);
+    } else {
+      this.stats.jsonHits++;
     }
     return data as T;
   }
@@ -78,8 +120,11 @@ export class EvidenceCache {
   getYaml<T>(path: string, resolver: () => T): T {
     let data = this.yaml.get(path);
     if (data === undefined) {
+      this.stats.yamlMisses++;
       data = resolver();
       this.yaml.set(path, data);
+    } else {
+      this.stats.yamlHits++;
     }
     return data as T;
   }
@@ -96,8 +141,11 @@ export class EvidenceCache {
     const cacheKey = this.createRegexKey(path, pattern);
     let matched = this.regexMatches.get(cacheKey);
     if (matched === undefined) {
+      this.stats.regexMisses++;
       matched = resolver();
       this.regexMatches.set(cacheKey, matched);
+    } else {
+      this.stats.regexHits++;
     }
     return matched;
   }
@@ -119,5 +167,17 @@ export class EvidenceCache {
     this.json.clear();
     this.yaml.clear();
     this.regexMatches.clear();
+    this.stats = {
+      fileHits: 0,
+      fileMisses: 0,
+      jsonHits: 0,
+      jsonMisses: 0,
+      yamlHits: 0,
+      yamlMisses: 0,
+      regexHits: 0,
+      regexMisses: 0,
+      contentHits: 0,
+      contentMisses: 0,
+    };
   }
 }

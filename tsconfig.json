@@ -8,10 +8,9 @@
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
     "outDir": "dist",
-    "rootDir": "src",
     "declaration": true,
     "declarationMap": true,
     "skipLibCheck": true
   },
-  "include": ["src"]
+  "include": ["src", "benchmark"]
 }

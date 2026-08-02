@@ -44,7 +44,14 @@ export type CapabilityCategory =
   | 'dateUtility'
   | 'logging'
   | 'documentation'
-  | 'build';
+  | 'build'
+  | 'ai'
+  | 'cloud'
+  | 'container'
+  | 'language'
+  | 'css'
+  | 'monitoring'
+  | 'analytics';
 
 /** Human-readable label for each capability category, used in terminal output */
 export const CATEGORY_LABELS: Record<CapabilityCategory, string> = {
@@ -65,6 +72,13 @@ export const CATEGORY_LABELS: Record<CapabilityCategory, string> = {
   logging: 'Logging',
   documentation: 'Docs',
   build: 'Build',
+  ai: 'AI',
+  cloud: 'Cloud',
+  container: 'Container',
+  language: 'Language',
+  css: 'CSS',
+  monitoring: 'Monitoring',
+  analytics: 'Analytics',
 };
 
 /** Display order for capability categories in terminal output */
@@ -86,6 +100,13 @@ export const CATEGORY_ORDER: CapabilityCategory[] = [
   'logging',
   'documentation',
   'build',
+  'ai',
+  'cloud',
+  'container',
+  'language',
+  'css',
+  'monitoring',
+  'analytics',
 ];
 
 // ─── Output Types ─────────────────────────────────────────────────────────────
