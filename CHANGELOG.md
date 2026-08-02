@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/sreeragpariyarath/norix/compare/v1.2.0...v1.3.0) (2026-08-02)
+
+
+### Features
+
+* **engine:** introduce domain reader protocols and context facade ([658020e](https://github.com/sreeragpariyarath/norix/commit/658020e73a7d408e561b95fc3db34a88270afe60))
+
 ## [1.2.0](https://github.com/sreeragpariyarath/norix/compare/v1.1.0...v1.2.0) (2026-08-02)
 
 
