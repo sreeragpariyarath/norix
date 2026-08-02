@@ -1,138 +1,67 @@
-# Automated Release Guide for Norix
+# Norix Release Guide
 
-This repository uses **GitHub Actions** to automate continuous integration (CI) and continuous delivery (CD). When you push a Git version tag, the pipeline automatically builds, verifies, and publishes the package to npm, and creates a GitHub Release.
+Norix follows a decoupled release strategy to maintain high code quality and prevent incomplete architecture migrations from flooding the npm registry.
+
+Releases are separated into two distinct phases:
+
+1. **Release Management (Automated via Release Please)**
+2. **Package Publishing (Manual Promoted Release)**
 
 ---
 
-## How Releases Work
-
-The release pipeline relies on **Git tags**. The pipeline only triggers publishing when a tag matching `v*` (e.g., `v1.0.1`) is pushed to the repository.
+## The Decoupled Release Architecture
 
 ```mermaid
 graph TD
-    A[Developer updates code & tests locally] --> B[npm version patch/minor/major]
-    B --> C[git push --follow-tags]
-    C --> D[GitHub receives tag v*]
-    D --> E[CD Pipeline Triggered]
-    E --> F[CI verification: Build & Typecheck]
-    F --> G[Publish to npm via Trusted Publishing / OIDC]
-    G --> H[Create GitHub Release & Upload Tarball Artifact]
+    A[Push to main] --> B[Release Please updates Release PR]
+    C[Merge Release PR] --> D[Release Please creates Git Tag & GitHub Release]
+    D --> E[Internal Release Finished]
+    E -->|Only when ready| F[Manual Publish to npm via workflow_dispatch]
+    F --> G[CI build, OIDC trusted auth, npm publish]
 ```
 
----
+### 1. Internal Releases (Automated)
 
-## How to Cut a New Release
+Every time a pull request is merged into `main`, GitHub Actions triggers the [Release Please](https://github.com/googleapis/release-please-action) workflow (`release.yml`).
 
-To publish a new version, follow these steps:
+- It parses Conventional Commits since the last tag.
+- It automatically creates or updates a pending **Release PR** that increments the version and generates `CHANGELOG.md` updates.
+- When a maintainer merges the **Release PR**, Release Please creates:
+  - A new git tag (e.g. `v1.5.0`)
+  - A GitHub Release with generated release notes
+- **Crucial Detail**: This internal release does **NOT** publish anything to npm automatically.
 
-### 1. (Recommended) Deploy via single command
+### 2. Public npm Releases (Manual promotion)
 
-Use `npm version` which increments the version in `package.json` and creates a matching Git tag, then push both to GitHub:
-
-```bash
-# Automate version bump (patch, minor, or major) and push tags
-npm version patch -m "Release %s" && git push --follow-tags
-```
-
-_Note: `--follow-tags` pushes both the new commits and the new tag in a single push._
+When a milestone or user-facing update is complete (e.g. migrating core detectors), a maintainer manually promotes a specific internal release tag to npm.
 
 ---
 
-## Automated npm Publishing Methods
+## How to Promote a Release to npm
 
-Our CD pipeline supports two methods of authentication with the npm registry:
+To publish a specific version to the npm registry:
 
-### Method A: Trusted Publishing (OIDC) — _Recommended & Secure_
+1. Go to the **Actions** tab in your GitHub repository.
+2. Select the **Publish to npm** workflow from the left sidebar.
+3. Click the **Run workflow** dropdown on the right side.
+4. Fill in the parameters:
+   - **Use workflow from**: Select `main` (the branch containing the workflow definition).
+   - **Git tag to build and publish**: Enter the exact git tag created by Release Please (e.g., `v1.4.0`).
+5. Click **Run workflow**.
 
-Trusted Publishing uses OpenID Connect (OIDC) to authenticate GitHub Actions directly with npm. This completely eliminates the need for long-lived, high-privilege npm tokens stored in your repository settings.
-
-#### How it works:
-
-1. When the workflow runs, GitHub issues a short-lived OIDC token.
-2. The `npm publish` command exchanges this token with npm.
-3. npm validates that the token originates from the correct GitHub repository, branch, and workflow filename.
-4. If valid, npm authorizes the publish with a build provenance certificate.
-
-### Method B: Traditional Secret Token (`NPM_TOKEN`) — _Fallback_
-
-If Trusted Publishing is not configured, the workflow looks for a repository secret named `NPM_TOKEN`. It configures your npm registry token locally during the run and publishes the package.
+This workflow checks out the code at that tag, runs full validation checks, and publishes the package to the public npm registry with OIDC Trusted Publishing and build provenance.
 
 ---
 
-## Repository & GitHub Configuration
+## Decoupled Authentication & Security
 
-To make this pipeline work, configure the following settings in your GitHub repository:
+Our publishing workflow uses **OIDC Trusted Publishing** (provenance-based publishing) to exchange short-lived tokens with `npmjs.com`, removing the need for long-lived static tokens stored as secrets.
 
-### 1. Workflow Permissions
+To authorize the publishing workflow on npm:
 
-Go to **Settings > Actions > General > Workflow permissions** and ensure:
-
-- **Read and write permissions** is selected (required for the release job to write release details and upload `.tgz` assets).
-- **Allow GitHub Actions to create and approve pull requests** (optional, but useful for other automations).
-
-### 2. Configure npm Trusted Publishing (OIDC)
-
-1. Log in to your account on [npmjs.com](https://www.npmjs.com/).
-2. Navigate to the **norix-cli** package settings.
-3. Go to **Settings > Publishing > Trusted Publishers** (or navigate directly to "Add a publisher").
-4. Choose **GitHub Actions** and fill in the details:
-   - **Owner**: `sreeragpariyarath` (case-sensitive)
-   - **Repository**: `norix` (case-sensitive)
-   - **Workflow filename**: `release.yml`
-5. Save. The CD pipeline is now authorized to publish without any password or token secrets!
-
-### 3. Fallback: NPM_TOKEN (Optional)
-
-If you prefer not to use OIDC, generate a new Classic Automation Token from npm and add it to your GitHub Repository:
-
-1. Go to **Settings > Secrets and variables > Actions** in your GitHub repository.
-2. Click **New repository secret**.
-3. Name: `NPM_TOKEN`
-4. Value: Paste your npm access token.
-
-### 4. Branch Protection Recommendations
-
-To guarantee repository stability and prevent broken releases, establish branch protection rules for `main`:
-
-1. Navigate to **Settings > Branches**.
-2. Under **Branch protection rules**, click **Add rule**.
-3. Branch pattern: `main`
-4. Enable:
-   - **Require a pull request before merging** (forces review).
-   - **Require status checks to pass before merging** — search for and select:
-     - `Build · Node 22`
-     - `Smoke Tests · ubuntu-latest · Node 22`
-     - `TypeScript latest`
-   - **Require branches to be up to date before merging**.
-
----
-
-## Troubleshooting Guide
-
-### 1. Job fails at publishing with `403 Forbidden` or `404 Not Found`
-
-- **Reason**: OIDC details do not match the config on npmjs.com.
-- **Fix**: Ensure your GitHub organization name, repository name, and the release workflow file name (`release.yml`) match exactly (case-sensitive) in both the npm dashboard and GitHub settings.
-
-### 2. Provenance generation fails
-
-- **Reason**: `id-token: write` permission is missing or you are not running in a supported environment.
-- **Fix**: Verify that your workflow has the `permissions.id-token: write` block at the workflow or job level.
-
-### 3. Rate limiting / token expiration
-
-- **Reason**: Classic token (`NPM_TOKEN`) expired.
-- **Fix**: Rotate the token on npmjs.com and update the `NPM_TOKEN` repository secret in GitHub.
-
----
-
-## Rollback Procedure
-
-If a published version contains a critical bug:
-
-1. **Deprecate the bad release** on npm immediately so users don't install it:
-   ```bash
-   npm deprecate norix-cli@1.0.1 "Critical bug found. Please upgrade to latest version."
-   ```
-2. **Fix the issue** on a hotfix branch.
-3. **Cut a new release** using the standard procedure (e.g. `npm version 1.0.2` or next patch). **Never attempt to overwrite or republish the same version number**; npm prevents overwrite publishes for security.
+1. Go to your package settings on [npmjs.com](https://www.npmjs.com/).
+2. Select **Settings > Publishing > Trusted Publishers**.
+3. Choose **GitHub Actions** and map it to:
+   - **GitHub Organization/User**: `sreeragpariyarath`
+   - **GitHub Repository**: `norix`
+   - **Workflow name**: `publish.yml`
