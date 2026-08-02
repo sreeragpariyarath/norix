@@ -210,7 +210,10 @@ norix <command> [options]
 
 Commands:
   analyze          Show repository overview (default)
+  insights         Generate architecture insights & AI recommendations
+  graph            Visualize architecture graph (tree, mermaid, json)
   doctor           Show repository health and capability overlaps
+  plugins          List active core detectors and third-party plugins
   report           Generate Markdown and JSON reports
 
 Global Options:
@@ -222,6 +225,12 @@ Command Options:
   analyze
     --json         Output as JSON to stdout (deprecated in favor of --format=json)
     --format       Format to output: summary | json | yaml | markdown | csv | sarif (default: summary)
+
+  insights
+    --format       Format to output: text | json | markdown (default: text)
+
+  graph
+    --format       Format to output: tree | mermaid | json (default: tree)
 
   doctor
     --json         Output findings as JSON to stdout
