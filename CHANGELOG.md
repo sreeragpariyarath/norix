@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.15.1](https://github.com/sreeragpariyarath/norix/compare/v1.15.0...v1.15.1) (2026-08-02)
+
+
+### Bug Fixes
+
+* **engine:** add devDependencies testing detectors (Vitest, Jest, Playwright, Cypress, Mocha) ([7564cfe](https://github.com/sreeragpariyarath/norix/commit/7564cfed0ec8a805b39b491e561df081d280412c))
+
 ## [1.15.0](https://github.com/sreeragpariyarath/norix/compare/v1.14.1...v1.15.0) (2026-08-02)
 
 
