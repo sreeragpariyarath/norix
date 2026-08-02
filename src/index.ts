@@ -4,7 +4,13 @@
 
 import { parseArgs } from 'node:util';
 import { resolve } from 'node:path';
-import { handleAnalyze, handleDoctor, handleReport, handlePlugins } from './commands/index.js';
+import {
+  handleAnalyze,
+  handleDoctor,
+  handleReport,
+  handlePlugins,
+  handleInsights,
+} from './commands/index.js';
 import { renderError } from './renderer.js';
 import type { ReportFormat } from './types.js';
 
@@ -21,6 +27,7 @@ const HELP = `
     doctor           Show repository health and capability overlaps
     report           Generate Markdown and JSON reports
     plugins          Show installed third-party detector plugins
+    insights         Show AI-ready architecture insights and recommendations
 
   Global Options:
     --cwd <path>     Set working directory  (default: current directory)
@@ -40,6 +47,9 @@ const HELP = `
       --output <dir>   Output directory  (default: current directory)
       --no-doctor      Exclude health findings from report
 
+    insights
+      --format         summary | json | markdown  (default: summary)
+
   Examples:
     norix analyze
     norix analyze --cwd ./my-project
@@ -48,6 +58,9 @@ const HELP = `
     norix doctor --severity warning
     norix report
     norix report --format markdown --output ./docs
+    norix insights
+    norix insights --format json
+    norix insights --format markdown
 `;
 
 async function main(): Promise<void> {
@@ -113,6 +126,15 @@ async function main(): Promise<void> {
     process.exit(2);
   }
 
+  if (command === 'insights') {
+    const insightsFormat = formatStr === 'all' ? 'summary' : formatStr;
+    const validInsightsFormats = ['summary', 'json', 'markdown'];
+    if (!validInsightsFormats.includes(insightsFormat)) {
+      renderError(`Invalid --format value: "${formatStr}". Valid values: summary, json, markdown`);
+      process.exit(2);
+    }
+  }
+
   try {
     switch (command) {
       case 'analyze': {
@@ -137,6 +159,12 @@ async function main(): Promise<void> {
 
       case 'plugins': {
         await handlePlugins(cwd, VERSION);
+        break;
+      }
+
+      case 'insights': {
+        const insightsFormat = formatStr === 'all' ? 'summary' : formatStr;
+        await handleInsights(cwd, insightsFormat, VERSION);
         break;
       }
 
