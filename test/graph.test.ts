@@ -13,7 +13,7 @@ import { createGraphRenderer } from '../src/graph/GraphRendererFactory.js';
 import { TreeRenderer } from '../src/graph/renderers/TreeRenderer.js';
 import { MermaidRenderer } from '../src/graph/renderers/MermaidRenderer.js';
 import { JsonRenderer } from '../src/graph/renderers/JsonRenderer.js';
-import type { ArchitectureGraph } from '../src/graph/types.js';
+import type { ArchitectureGraph, GraphFormat } from '../src/graph/types.js';
 
 function createMockScan(
   packages: Record<string, string>,
