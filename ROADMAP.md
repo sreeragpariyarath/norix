@@ -11,8 +11,8 @@
 ### Frontend
 
 - [x] Next.js
-- [ ] React
-- [ ] Vite
+- [x] React
+- [x] Vite
 - [ ] React Router
 
 ### Backend
