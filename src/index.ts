@@ -16,7 +16,7 @@ import { GRAPH_FORMATS, type GraphFormat } from './graph/types.js';
 import { renderError } from './renderer.js';
 import type { ReportFormat } from './types.js';
 
-const VERSION = '1.0.0';
+const VERSION = '1.15.1';
 
 const HELP = `
   norix — Repository Analysis CLI  (v${VERSION})
