@@ -37,8 +37,8 @@
 
 ### DevOps
 
-- [ ] Docker
-- [ ] Kubernetes
+- [x] Docker
+- [x] Kubernetes
 
 ### AI
 
