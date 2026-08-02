@@ -83,7 +83,7 @@ yarn global add norix-cli
 
 ## Usage
 
-`norix` provides three main commands: `analyze`, `doctor`, and `report`.
+`norix` provides five main commands: `analyze`, `insights`, `graph`, `doctor`, and `report`.
 
 ### 1. Analyze the Stack
 
@@ -93,7 +93,25 @@ Shows the high-level repository overview and detected capabilities.
 norix analyze [options]
 ```
 
-### 2. Check Repository Health
+### 2. Project Insights
+
+Generates AI-ready architecture reports with project archetypes, strengths, risks, and recommendations.
+
+```bash
+norix insights [options]
+```
+
+### 3. Architecture Graph
+
+Visualizes project architecture dependencies in ASCII tree, Mermaid, or JSON formats.
+
+```bash
+norix graph --format=tree
+norix graph --format=mermaid
+norix graph --format=json
+```
+
+### 4. Check Repository Health
 
 Scans the project for potential capability overlaps (e.g. multiple loggers or HTTP clients).
 
@@ -101,7 +119,7 @@ Scans the project for potential capability overlaps (e.g. multiple loggers or HT
 norix doctor [options]
 ```
 
-### 3. Generate Reports
+### 5. Generate Reports
 
 Export the analysis results to Markdown or JSON formats for documentation or automated tooling.
 

@@ -10,7 +10,9 @@ import {
   handleReport,
   handlePlugins,
   handleInsights,
+  handleGraph,
 } from './commands/index.js';
+import { GRAPH_FORMATS, type GraphFormat } from './graph/types.js';
 import { renderError } from './renderer.js';
 import type { ReportFormat } from './types.js';
 
@@ -28,6 +30,7 @@ const HELP = `
     report           Generate Markdown and JSON reports
     plugins          Show installed third-party detector plugins
     insights         Show AI-ready architecture insights and recommendations
+    graph            Show architecture dependency graph visualization
 
   Global Options:
     --cwd <path>     Set working directory  (default: current directory)
@@ -50,6 +53,9 @@ const HELP = `
     insights
       --format         summary | json | markdown  (default: summary)
 
+    graph
+      --format         tree | mermaid | json  (default: tree)
+
   Examples:
     norix analyze
     norix analyze --cwd ./my-project
@@ -61,6 +67,9 @@ const HELP = `
     norix insights
     norix insights --format json
     norix insights --format markdown
+    norix graph
+    norix graph --format mermaid
+    norix graph --format json
 `;
 
 async function main(): Promise<void> {
@@ -135,6 +144,16 @@ async function main(): Promise<void> {
     }
   }
 
+  if (command === 'graph') {
+    const graphFormat = formatStr === 'all' ? 'tree' : formatStr;
+    if (!GRAPH_FORMATS.includes(graphFormat as GraphFormat)) {
+      renderError(
+        `Invalid --format value: "${formatStr}". Valid values: ${GRAPH_FORMATS.join(', ')}`,
+      );
+      process.exit(2);
+    }
+  }
+
   try {
     switch (command) {
       case 'analyze': {
@@ -165,6 +184,12 @@ async function main(): Promise<void> {
       case 'insights': {
         const insightsFormat = formatStr === 'all' ? 'summary' : formatStr;
         await handleInsights(cwd, insightsFormat, VERSION);
+        break;
+      }
+
+      case 'graph': {
+        const graphFormat = (formatStr === 'all' ? 'tree' : formatStr) as GraphFormat;
+        await handleGraph(cwd, graphFormat);
         break;
       }
 
