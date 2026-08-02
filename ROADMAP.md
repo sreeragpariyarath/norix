@@ -37,8 +37,13 @@
 
 ### DevOps
 
-- [x] Docker
-- [x] Kubernetes
+- [ ] Docker
+- [ ] Kubernetes
+
+### Build Tools & Monorepos
+
+- [x] Turborepo
+- [x] Nx
 
 ### AI
 

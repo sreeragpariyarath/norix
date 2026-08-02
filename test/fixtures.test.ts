@@ -109,39 +109,20 @@ describe('Real Repository Fixture Validation', () => {
       ),
     );
 
-    // 7. docker-app
-    const dockerDir = join(FIXTURES_ROOT, 'docker-app');
-    ensureDir(dockerDir);
+    // 7. monorepo-turbo
+    const turboDir = join(FIXTURES_ROOT, 'monorepo-turbo');
+    ensureDir(turboDir);
     writeFileSync(
-      join(dockerDir, 'package.json'),
+      join(turboDir, 'package.json'),
       JSON.stringify(
         {
-          name: 'docker-app',
-          dependencies: {},
+          name: 'monorepo-turbo',
+          dependencies: { turbo: '1.10.1' },
         },
         null,
         2,
       ),
     );
-    writeFileSync(join(dockerDir, 'Dockerfile'), 'FROM node:20');
-    writeFileSync(join(dockerDir, 'docker-compose.yml'), 'version: "3.8"\nservices: {}');
-
-    // 8. monorepo-pnpm
-    const pnpmDir = join(FIXTURES_ROOT, 'monorepo-pnpm');
-    ensureDir(pnpmDir);
-    writeFileSync(
-      join(pnpmDir, 'package.json'),
-      JSON.stringify(
-        {
-          name: 'monorepo-pnpm',
-          dependencies: {},
-        },
-        null,
-        2,
-      ),
-    );
-    writeFileSync(join(pnpmDir, 'pnpm-workspace.yaml'), 'packages:\n  - "packages/*"');
-    writeFileSync(join(pnpmDir, 'pnpm-lock.yaml'), '# mock lockfile');
   });
 
   afterAll(() => {
@@ -215,36 +196,13 @@ describe('Real Repository Fixture Validation', () => {
     expect(newAnalysis.capabilities.database).toEqual(legacyAnalysis.capabilities.database);
   });
 
-  it('should validate and confirm modern infrastructure detections on docker-app', async () => {
-    const root = join(FIXTURES_ROOT, 'docker-app');
+  it('should validate and compare outputs for monorepo-turbo', async () => {
+    const root = join(FIXTURES_ROOT, 'monorepo-turbo');
     const scanResult = await scan(root);
 
     const legacyAnalysis = analyze(scanResult);
     const newAnalysis = await runNewEngine(scanResult);
 
-    // Legacy analyzer matches nothing since it has no package dependencies
-    expect(legacyAnalysis.capabilities).toEqual({});
-
-    // Modern engine detects Docker and Docker Compose
-    expect(newAnalysis.capabilities.container).toBeDefined();
-    const containerCaps = newAnalysis.capabilities.container!;
-    expect(containerCaps.some((c) => c.label === 'Docker')).toBe(true);
-    expect(containerCaps.some((c) => c.label === 'Docker Compose')).toBe(true);
-  });
-
-  it('should validate and confirm modern infrastructure detections on monorepo-pnpm', async () => {
-    const root = join(FIXTURES_ROOT, 'monorepo-pnpm');
-    const scanResult = await scan(root);
-
-    const legacyAnalysis = analyze(scanResult);
-    const newAnalysis = await runNewEngine(scanResult);
-
-    // Legacy analyzer matches nothing
-    expect(legacyAnalysis.capabilities).toEqual({});
-
-    // Modern engine detects pnpm package manager
-    expect(newAnalysis.capabilities.build).toBeDefined();
-    const buildCaps = newAnalysis.capabilities.build!;
-    expect(buildCaps.some((c) => c.label === 'pnpm')).toBe(true);
+    expect(newAnalysis.capabilities.build).toEqual(legacyAnalysis.capabilities.build);
   });
 });

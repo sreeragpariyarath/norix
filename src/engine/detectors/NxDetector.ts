@@ -4,13 +4,12 @@ import { Evidence, EvidenceType, EvidenceSourceType } from '../types/Evidence.js
 import { EvidenceContext } from '../context/EvidenceContext.js';
 
 const WEIGHTS = {
-  NX_DEPENDENCY: 0.8,
-  NX_CONFIG: 1.0,
+  NX_DEPENDENCY: 1.0,
 };
 
 /**
  * Capability detector for Nx workspaces.
- * Gathers evidence based on configuration and package declarations.
+ * Gathers evidence based on package declarations.
  */
 export class NxDetector implements Detector {
   readonly id = 'nx';
@@ -36,15 +35,6 @@ export class NxDetector implements Detector {
 
       const v = context.node.getPackageVersion('nx');
       if (v) version = v;
-    }
-
-    if (context.fileSystem.hasFile('nx.json')) {
-      evidence.push({
-        type: EvidenceType.FilePresence,
-        source: { type: EvidenceSourceType.Config, name: 'nx.json' },
-        message: 'Found Nx configuration file "nx.json"',
-        weight: WEIGHTS.NX_CONFIG,
-      });
     }
 
     const result: { evidence: Evidence[]; version?: string } = { evidence };

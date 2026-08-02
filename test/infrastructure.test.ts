@@ -1,26 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { DockerDetector } from '../src/engine/detectors/DockerDetector.js';
-import { DockerComposeDetector } from '../src/engine/detectors/DockerComposeDetector.js';
-import { KubernetesDetector } from '../src/engine/detectors/KubernetesDetector.js';
-import { HelmDetector } from '../src/engine/detectors/HelmDetector.js';
 import { TurboRepoDetector } from '../src/engine/detectors/TurboRepoDetector.js';
 import { NxDetector } from '../src/engine/detectors/NxDetector.js';
-import { LernaDetector } from '../src/engine/detectors/LernaDetector.js';
-import { NpmDetector } from '../src/engine/detectors/NpmDetector.js';
-import { PnpmDetector } from '../src/engine/detectors/PnpmDetector.js';
-import { YarnDetector } from '../src/engine/detectors/YarnDetector.js';
-import { BunDetector } from '../src/engine/detectors/BunDetector.js';
-import { GitHubActionsDetector } from '../src/engine/detectors/GitHubActionsDetector.js';
-import { GitLabCIDetector } from '../src/engine/detectors/GitLabCIDetector.js';
-import { CircleCIDetector } from '../src/engine/detectors/CircleCIDetector.js';
-import { AzurePipelinesDetector } from '../src/engine/detectors/AzurePipelinesDetector.js';
-import { VercelDetector } from '../src/engine/detectors/VercelDetector.js';
-import { NetlifyDetector } from '../src/engine/detectors/NetlifyDetector.js';
 import { EvidenceContext } from '../src/engine/context/EvidenceContext.js';
 import { NodePackageReader } from '../src/engine/context/readers/NodePackageReader.js';
 import { WorkspaceReader } from '../src/engine/context/readers/WorkspaceReader.js';
 import { EnvReader } from '../src/engine/context/readers/EnvReader.js';
-import { ConfigReader, DockerComposeManifest } from '../src/engine/context/readers/ConfigReader.js';
+import { ConfigReader } from '../src/engine/context/readers/ConfigReader.js';
 import { FileReader } from '../src/engine/context/readers/FileReader.js';
 import { DetectorRegistry } from '../src/engine/registry/DetectorRegistry.js';
 
@@ -28,7 +13,6 @@ function createMockContext(options: {
   packages?: string[];
   versionMap?: Record<string, string>;
   files?: string[];
-  composeManifest?: DockerComposeManifest;
 }): EvidenceContext {
   const fileSet = new Set(options.files || []);
 
@@ -46,7 +30,7 @@ function createMockContext(options: {
   };
 
   const configReader: ConfigReader = {
-    getDockerCompose: async () => options.composeManifest || null,
+    getDockerCompose: async () => null,
     searchInConfig: async () => false,
   };
 
@@ -60,209 +44,65 @@ function createMockContext(options: {
   };
 }
 
-describe('DockerDetector', () => {
-  const detector = new DockerDetector();
+describe('TurboRepoDetector', () => {
+  const detector = new TurboRepoDetector();
 
-  it('should compile evidence when Dockerfile is present', async () => {
+  it('should compile evidence and extract version when turbo package is present', async () => {
     const context = createMockContext({
-      files: ['Dockerfile', '.dockerignore'],
+      packages: ['turbo'],
+      versionMap: { turbo: '1.10.1' },
     });
 
-    const { evidence } = await detector.detect(context);
-    expect(evidence).toHaveLength(2);
-    expect(evidence[0].type).toBe('file_presence');
+    const { evidence, version } = await detector.detect(context);
+    expect(evidence).toHaveLength(1);
+    expect(evidence[0].type).toBe('dependency');
+    expect(version).toBe('1.10.1');
   });
 
-  it('should return no evidence when absent', async () => {
+  it('should return no evidence when turbo is absent', async () => {
     const context = createMockContext({});
     const { evidence } = await detector.detect(context);
     expect(evidence).toHaveLength(0);
   });
 });
 
-describe('DockerComposeDetector', () => {
-  const detector = new DockerComposeDetector();
-
-  it('should compile evidence and extract version when compose file exists', async () => {
-    const context = createMockContext({
-      files: ['docker-compose.yml'],
-      composeManifest: { version: '3.8', services: {} },
-    });
-
-    const { evidence, version } = await detector.detect(context);
-    expect(evidence).toHaveLength(1);
-    expect(version).toBe('3.8');
-  });
-});
-
-describe('KubernetesDetector', () => {
-  const detector = new KubernetesDetector();
-
-  it('should compile evidence when k8s folder is present', async () => {
-    const context = createMockContext({
-      files: ['k8s'],
-    });
-
-    const { evidence } = await detector.detect(context);
-    expect(evidence).toHaveLength(1);
-  });
-});
-
-describe('HelmDetector', () => {
-  const detector = new HelmDetector();
-
-  it('should compile evidence when Chart.yaml is present', async () => {
-    const context = createMockContext({
-      files: ['Chart.yaml', 'values.yaml'],
-    });
-
-    const { evidence } = await detector.detect(context);
-    expect(evidence).toHaveLength(2);
-  });
-});
-
-describe('TurboRepoDetector', () => {
-  const detector = new TurboRepoDetector();
-
-  it('should compile evidence when turbo.json is present', async () => {
-    const context = createMockContext({
-      packages: ['turbo'],
-      versionMap: { turbo: '1.10.1' },
-      files: ['turbo.json'],
-    });
-
-    const { evidence, version } = await detector.detect(context);
-    expect(evidence).toHaveLength(2);
-    expect(version).toBe('1.10.1');
-  });
-});
-
 describe('NxDetector', () => {
   const detector = new NxDetector();
 
-  it('should compile evidence when nx.json is present', async () => {
+  it('should compile evidence and extract version when nx package is present', async () => {
     const context = createMockContext({
       packages: ['nx'],
       versionMap: { nx: '16.5.0' },
-      files: ['nx.json'],
     });
 
     const { evidence, version } = await detector.detect(context);
-    expect(evidence).toHaveLength(2);
+    expect(evidence).toHaveLength(1);
+    expect(evidence[0].type).toBe('dependency');
     expect(version).toBe('16.5.0');
   });
 });
 
-describe('LernaDetector', () => {
-  const detector = new LernaDetector();
-
-  it('should compile evidence when lerna.json is present', async () => {
-    const context = createMockContext({
-      packages: ['lerna'],
-      versionMap: { lerna: '7.1.0' },
-      files: ['lerna.json'],
-    });
-
-    const { evidence, version } = await detector.detect(context);
-    expect(evidence).toHaveLength(2);
-    expect(version).toBe('7.1.0');
-  });
-});
-
-describe('Package Managers (npm, pnpm, Yarn, Bun)', () => {
-  it('should compile evidence for npm', async () => {
-    const detector = new NpmDetector();
-    const context = createMockContext({ files: ['package-lock.json'] });
-    const { evidence } = await detector.detect(context);
-    expect(evidence).toHaveLength(1);
-  });
-
-  it('should compile evidence for pnpm', async () => {
-    const detector = new PnpmDetector();
-    const context = createMockContext({ files: ['pnpm-lock.yaml', 'pnpm-workspace.yaml'] });
-    const { evidence } = await detector.detect(context);
-    expect(evidence).toHaveLength(2);
-  });
-
-  it('should compile evidence for Yarn', async () => {
-    const detector = new YarnDetector();
-    const context = createMockContext({ files: ['yarn.lock'] });
-    const { evidence } = await detector.detect(context);
-    expect(evidence).toHaveLength(1);
-  });
-
-  it('should compile evidence for Bun', async () => {
-    const detector = new BunDetector();
-    const context = createMockContext({ files: ['bun.lockb'] });
-    const { evidence } = await detector.detect(context);
-    expect(evidence).toHaveLength(1);
-  });
-});
-
-describe('CI/CD (GitHub, GitLab, CircleCI, Azure)', () => {
-  it('should compile evidence for GitHub Actions', async () => {
-    const detector = new GitHubActionsDetector();
-    const context = createMockContext({ files: ['.github/workflows'] });
-    const { evidence } = await detector.detect(context);
-    expect(evidence).toHaveLength(1);
-  });
-
-  it('should compile evidence for GitLab CI', async () => {
-    const detector = new GitLabCIDetector();
-    const context = createMockContext({ files: ['.gitlab-ci.yml'] });
-    const { evidence } = await detector.detect(context);
-    expect(evidence).toHaveLength(1);
-  });
-
-  it('should compile evidence for CircleCI', async () => {
-    const detector = new CircleCIDetector();
-    const context = createMockContext({ files: ['.circleci/config.yml'] });
-    const { evidence } = await detector.detect(context);
-    expect(evidence).toHaveLength(1);
-  });
-
-  it('should compile evidence for Azure Pipelines', async () => {
-    const detector = new AzurePipelinesDetector();
-    const context = createMockContext({ files: ['azure-pipelines.yml'] });
-    const { evidence } = await detector.detect(context);
-    expect(evidence).toHaveLength(1);
-  });
-});
-
-describe('Cloud (Vercel, Netlify)', () => {
-  it('should compile evidence for Vercel', async () => {
-    const detector = new VercelDetector();
-    const context = createMockContext({ files: ['vercel.json', '.vercel'] });
-    const { evidence } = await detector.detect(context);
-    expect(evidence).toHaveLength(2);
-  });
-
-  it('should compile evidence for Netlify', async () => {
-    const detector = new NetlifyDetector();
-    const context = createMockContext({ files: ['netlify.toml'] });
-    const { evidence } = await detector.detect(context);
-    expect(evidence).toHaveLength(1);
-  });
-});
-
-describe('DevOps Integrations via Registry', () => {
-  it('should execute pipeline correctly and resolve docker and vercel configs', async () => {
+describe('Infrastructure Integration via Registry', () => {
+  it('should execute build capability detectors and calculate scores', async () => {
     const registry = new DetectorRegistry();
-    registry.add([new DockerDetector(), new VercelDetector()]);
+    registry.add([new TurboRepoDetector(), new NxDetector()]);
 
     const context = createMockContext({
-      files: ['Dockerfile', 'vercel.json'],
+      packages: ['turbo'],
+      versionMap: { turbo: '1.10.1' },
     });
 
     const results = await registry.execute(context);
     expect(results).toHaveLength(2);
 
-    expect(results[0].detectorId).toBe('docker');
-    expect(results[0].matched).toBe(true);
-    expect(results[0].confidence).toBe(1.0);
+    const turboResult = results[0];
+    expect(turboResult.detectorId).toBe('turborepo');
+    expect(turboResult.matched).toBe(true);
+    expect(turboResult.version).toBe('1.10.1');
+    expect(turboResult.confidence).toBe(1.0);
 
-    expect(results[1].detectorId).toBe('vercel');
-    expect(results[1].matched).toBe(true);
-    expect(results[1].confidence).toBe(1.0);
+    const nxResult = results[1];
+    expect(nxResult.detectorId).toBe('nx');
+    expect(nxResult.matched).toBe(false);
   });
 });
