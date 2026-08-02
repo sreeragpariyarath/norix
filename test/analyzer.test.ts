@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { analyze } from '../src/analyzer.js';
 import type { ScanResult } from '../src/types.js';
+import { runNewEngine } from '../src/engine/integration.js';
 
 describe('analyze', () => {
   const createMockScanResult = (packages: Record<string, string>): ScanResult => {
@@ -96,5 +97,51 @@ describe('analyze', () => {
     expect(framework[0]!.label).toBe('Next.js');
     expect(orm[0]!.label).toBe('Prisma');
     expect(validation[0]!.label).toBe('Zod');
+  });
+});
+
+describe('new engine integration comparison', () => {
+  const createMockScanResult = (packages: Record<string, string>): ScanResult => {
+    const allPackages = new Map<string, { version: string; isDev: boolean }>();
+    for (const [name, version] of Object.entries(packages)) {
+      allPackages.set(name, { version, isDev: false });
+    }
+
+    return {
+      repoName: 'test-repo',
+      repoRoot: '/path/to/test-repo',
+      isMonorepo: false,
+      workspaceNames: [],
+      workspaces: [],
+      allPackages,
+      language: 'TypeScript',
+      packageManager: 'npm',
+      packageJsonCount: 1,
+      duration: 10,
+    };
+  };
+
+  it('should match legacy analyzer outputs for Next.js', async () => {
+    const scan = createMockScanResult({
+      next: '14.0.0',
+    });
+
+    const legacyRes = analyze(scan);
+    const newRes = await runNewEngine(scan);
+
+    expect(newRes.capabilities.framework).toEqual(legacyRes.capabilities.framework);
+  });
+
+  it('should match legacy analyzer outputs for Prisma and SQLite', async () => {
+    const scan = createMockScanResult({
+      '@prisma/client': '5.0.0',
+      'better-sqlite3': '9.0.0',
+    });
+
+    const legacyRes = analyze(scan);
+    const newRes = await runNewEngine(scan);
+
+    expect(newRes.capabilities.orm).toEqual(legacyRes.capabilities.orm);
+    expect(newRes.capabilities.database).toEqual(legacyRes.capabilities.database);
   });
 });

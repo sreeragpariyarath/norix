@@ -61,6 +61,7 @@ async function main(): Promise<void> {
       format: { type: 'string', default: 'all' },
       output: { type: 'string', short: 'o' },
       'no-doctor': { type: 'boolean', default: false },
+      engine: { type: 'string', default: 'legacy' },
     },
     allowPositionals: true,
     strict: false,
@@ -83,6 +84,7 @@ async function main(): Promise<void> {
   const formatStr = typeof values.format === 'string' ? values.format : 'all';
   const outputDir = typeof values.output === 'string' ? resolve(values.output) : cwd;
   const noDoctor = Boolean(values['no-doctor']);
+  const engine = typeof values.engine === 'string' ? values.engine : 'legacy';
 
   if (command === 'doctor' && !['warning', 'info', 'all'].includes(severityStr)) {
     renderError(`Invalid --severity value: "${severityStr}". Valid values: warning, info, all`);
@@ -98,7 +100,7 @@ async function main(): Promise<void> {
   try {
     switch (command) {
       case 'analyze': {
-        await handleAnalyze(cwd, isJson, VERSION);
+        await handleAnalyze(cwd, isJson, VERSION, engine);
         break;
       }
 
