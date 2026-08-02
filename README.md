@@ -340,24 +340,6 @@ norix plugins
 
 ---
 
-# 📈 GitHub Statistics
-
-<p align="center">
-  <img src="profile-summary-card-output/github_dark/profile-details.svg" />
-</p>
-
-<p align="center">
-  <img width="49%" src="profile-summary-card-output/github_dark/stats.svg" />
-  <img width="49%" src="profile-summary-card-output/github_dark/repos-per-language.svg" />
-</p>
-
-<p align="center">
-  <img width="49%" src="profile-summary-card-output/github_dark/most-commit-language.svg" />
-  <img width="49%" src="profile-summary-card-output/github_dark/productive-time.svg" />
-</p>
-
----
-
 # Performance
 
 Norix includes a benchmarking suite.
