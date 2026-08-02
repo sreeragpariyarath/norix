@@ -132,18 +132,29 @@ norix report [options]
 | **Docs**        | Storybook, VitePress, Docusaurus, TypeDoc                                                     |
 | **Build**       | Vite, Webpack, esbuild, Turborepo, Nx                                                         |
 
-## JSON Output
+## Output Formats
 
-Generate machine-readable outputs for custom integrations or CI scripts:
+Norix supports exporting repository analysis results in multiple formats using the `--format` option on the `analyze` command:
 
 ```bash
-norix analyze --json
+norix analyze --format=<format>
 ```
+
+| Format              | Description                                                         | Example command                   |
+| :------------------ | :------------------------------------------------------------------ | :-------------------------------- |
+| `summary` (default) | A polished, human-readable terminal report grouped by layer         | `norix analyze --format=summary`  |
+| `json`              | A structured, machine-readable JSON schema for API ingestion        | `norix analyze --format=json`     |
+| `yaml`              | A clean YAML equivalent of the scan capabilities report             | `norix analyze --format=yaml`     |
+| `markdown`          | A GitHub-ready markdown document detailing scanned metadata         | `norix analyze --format=markdown` |
+| `csv`               | A flat tabular format listing one capability match per row          | `norix analyze --format=csv`      |
+| `sarif`             | A valid SARIF v2.1.0 JSON payload suitable for GitHub Code Scanning | `norix analyze --format=sarif`    |
+
+### JSON Output Example
 
 ```json
 {
   "version": "1",
-  "norixVersion": "1.0.0",
+  "norixVersion": "2.0.0",
   "timestamp": "2026-08-01T10:00:00Z",
   "repository": {
     "name": "my-app",
@@ -191,7 +202,8 @@ Global Options:
 
 Command Options:
   analyze
-    --json         Output as JSON to stdout
+    --json         Output as JSON to stdout (deprecated in favor of --format=json)
+    --format       Format to output: summary | json | yaml | markdown | csv | sarif (default: summary)
 
   doctor
     --json         Output findings as JSON to stdout
