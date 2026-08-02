@@ -33,14 +33,26 @@ export class DetectorRegistry {
         const confidence = ConfidenceEngine.calculate(evidence);
         const threshold = detector.threshold !== undefined ? detector.threshold : 0.3;
 
-        results.push({
+        let version: string | undefined;
+        if (detector.versionQuery) {
+          const v = context.node.getPackageVersion(detector.versionQuery);
+          if (v) version = v;
+        }
+
+        const result: DetectionResult = {
           detectorId: detector.id,
           capability: detector.label,
           category: detector.category,
           matched: confidence >= threshold,
           confidence,
           evidence,
-        });
+        };
+
+        if (version !== undefined) {
+          result.version = version;
+        }
+
+        results.push(result);
       } catch (error) {
         // Safe fallback in case of individual detector exception
         results.push({
