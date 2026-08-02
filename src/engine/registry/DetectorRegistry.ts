@@ -31,16 +31,17 @@ export class DetectorRegistry {
       try {
         const evidence = await detector.detect(context);
         const confidence = ConfidenceEngine.calculate(evidence);
+        const threshold = detector.threshold !== undefined ? detector.threshold : 0.3;
 
         results.push({
           detectorId: detector.id,
           capability: detector.label,
           category: detector.category,
-          matched: confidence >= 0.5,
+          matched: confidence >= threshold,
           confidence,
           evidence,
         });
-      } catch {
+      } catch (error) {
         // Safe fallback in case of individual detector exception
         results.push({
           detectorId: detector.id,
@@ -49,6 +50,7 @@ export class DetectorRegistry {
           matched: false,
           confidence: 0.0,
           evidence: [],
+          error: error instanceof Error ? error.message : String(error),
         });
       }
     }

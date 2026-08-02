@@ -20,4 +20,6 @@ export interface DetectionResult {
   version?: string;
   /** List of all evidence items compiled during detector execution */
   evidence: Evidence[];
+  /** Optional error diagnostic message if the execution failed */
+  error?: string;
 }

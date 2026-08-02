@@ -14,6 +14,8 @@ export interface Detector {
   readonly category: CapabilityCategory;
   /** Sub-role classification within the capability category */
   readonly role: string;
+  /** Optional custom match confidence threshold (defaults to 0.3) */
+  readonly threshold?: number;
 
   /**
    * Scans the repository context and compiles a list of registered evidence.
