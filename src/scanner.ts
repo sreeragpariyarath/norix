@@ -228,10 +228,8 @@ export async function scan(root: string): Promise<ScanResult> {
   });
 
   // 3. Detect workspace configuration
-  let workspacePatterns: string[] | null = null;
-
   // Priority 1: pnpm-workspace.yaml
-  workspacePatterns = parsePnpmWorkspaceYaml(resolvedRoot);
+  let workspacePatterns: string[] | null = parsePnpmWorkspaceYaml(resolvedRoot);
 
   // Priority 2: package.json workspaces field (npm/yarn)
   if (!workspacePatterns && rootPkg.workspaces) {
