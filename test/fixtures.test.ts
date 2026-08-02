@@ -15,6 +15,11 @@ function ensureDir(dirPath: string) {
 
 describe('Real Repository Fixture Validation', () => {
   beforeAll(() => {
+    try {
+      rmSync(FIXTURES_ROOT, { recursive: true, force: true });
+    } catch {
+      // ignore
+    }
     ensureDir(FIXTURES_ROOT);
 
     // 1. nextjs-app
