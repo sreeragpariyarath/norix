@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.7.0](https://github.com/sreeragpariyarath/norix/compare/v1.6.0...v1.7.0) (2026-08-02)
+
+
+### Features
+
+* **engine:** migrate React capability detector to the new execution pipeline ([9d65756](https://github.com/sreeragpariyarath/norix/commit/9d657564b6453bc247bc3a2c53f007501797d1a0))
+* **engine:** migrate Vite capability detector to the new execution pipeline ([ff30419](https://github.com/sreeragpariyarath/norix/commit/ff3041919bb8ed912cb566e713c91edaa90c36f1))
+
 ## [1.6.0](https://github.com/sreeragpariyarath/norix/compare/v1.5.0...v1.6.0) (2026-08-02)
 
 
