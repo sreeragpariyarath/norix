@@ -8,5 +8,9 @@ export const emailEntries: DbEntry[] = [
   { packages: ['mailersend'], label: 'MailerSend', role: 'email-api' },
   { packages: ['@mailchimp/mailchimp_transactional'], label: 'Mailchimp', role: 'email-api' },
   { packages: ['aws-sdk', '@aws-sdk/client-ses'], label: 'AWS SES', role: 'email-api' },
-  { packages: ['@react-email/components', '@react-email/render'], label: 'React Email', role: 'email-template' },
+  {
+    packages: ['@react-email/components', '@react-email/render'],
+    label: 'React Email',
+    role: 'email-template',
+  },
 ];

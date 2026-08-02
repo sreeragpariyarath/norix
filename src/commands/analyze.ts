@@ -36,18 +36,12 @@ function toJson(result: AnalysisResult, version: string): unknown {
   };
 }
 
-export async function handleAnalyze(
-  cwd: string,
-  asJson: boolean,
-  version: string,
-): Promise<void> {
+export async function handleAnalyze(cwd: string, asJson: boolean, version: string): Promise<void> {
   const scanResult = await scan(cwd);
   const analysisResult = analyze(scanResult);
 
   if (asJson) {
-    process.stdout.write(
-      JSON.stringify(toJson(analysisResult, version), null, 2) + '\n',
-    );
+    process.stdout.write(JSON.stringify(toJson(analysisResult, version), null, 2) + '\n');
   } else {
     renderAnalysis(analysisResult);
   }

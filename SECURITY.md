@@ -2,7 +2,7 @@
 
 ## Reporting Security Issues
 
-Norix is a read-only repository scanner that operates completely locally without sending any data over the network. 
+Norix is a read-only repository scanner that operates completely locally without sending any data over the network.
 
 If you discover a security vulnerability or security-related issue in Norix, please report it responsibly.
 

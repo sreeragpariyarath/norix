@@ -2,7 +2,13 @@ import type { DbEntry } from '../types.js';
 
 export const documentationEntries: DbEntry[] = [
   {
-    packages: ['@storybook/react', '@storybook/vue3', '@storybook/svelte', '@storybook/nextjs', 'storybook'],
+    packages: [
+      '@storybook/react',
+      '@storybook/vue3',
+      '@storybook/svelte',
+      '@storybook/nextjs',
+      'storybook',
+    ],
     label: 'Storybook',
     role: 'component-docs',
   },

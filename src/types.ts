@@ -27,7 +27,6 @@ export type CapabilityDb = Partial<Record<CapabilityCategory, DbEntry[]>>;
 
 // ─── Capability Categories ────────────────────────────────────────────────────
 
-
 export type CapabilityCategory =
   | 'framework'
   | 'packageManager'

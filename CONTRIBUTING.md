@@ -7,12 +7,14 @@ Thank you for your interest in contributing to Norix! We welcome community contr
 ## 🚀 Quick Start
 
 1. **Fork and Clone**
+
    ```bash
    git clone https://github.com/<your-username>/norix.git
    cd norix
    ```
 
 2. **Install Dependencies**
+
    ```bash
    npm install
    ```
@@ -30,13 +32,15 @@ Thank you for your interest in contributing to Norix! We welcome community contr
 Most contributions involve expanding the Capability Database in `src/db.ts`.
 
 ### Rules for DB Entries:
+
 1. **Packages array (`packages`)**: List the exact npm package names.
 2. **Label (`label`)**: Use the official, human-readable name of the tool.
-3. **Role (`role`)**: Specify the exact sub-type role. 
-   - *Example:* `jest` has `role: 'test-runner'`, whereas `supertest` has `role: 'http-assertion'`.
-   - *Why role matters:* Two tools sharing the same role are flagged by `norix doctor` as competing overlaps, while tools with different roles are recognized as complementary.
+3. **Role (`role`)**: Specify the exact sub-type role.
+   - _Example:_ `jest` has `role: 'test-runner'`, whereas `supertest` has `role: 'http-assertion'`.
+   - _Why role matters:_ Two tools sharing the same role are flagged by `norix doctor` as competing overlaps, while tools with different roles are recognized as complementary.
 
 ### Example Entry:
+
 ```ts
 {
   packages: ['hono'],

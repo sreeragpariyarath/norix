@@ -31,9 +31,7 @@ function mergePackages(
 ): void {
   const deps = [
     ...Object.entries(pkg.dependencies ?? {}),
-    ...Object.entries(pkg.devDependencies ?? {}).map(
-      ([k, v]) => [k, v] as [string, string],
-    ),
+    ...Object.entries(pkg.devDependencies ?? {}).map(([k, v]) => [k, v] as [string, string]),
   ];
   for (const [name, version] of deps) {
     if (!into.has(name)) {
@@ -188,9 +186,7 @@ function parsePnpmWorkspaceYaml(root: string): string[] | null {
   }
 }
 
-function extractPackageMap(
-  pkg: PackageJsonFile,
-): Map<string, { version: string; isDev: boolean }> {
+function extractPackageMap(pkg: PackageJsonFile): Map<string, { version: string; isDev: boolean }> {
   const map = new Map<string, { version: string; isDev: boolean }>();
   mergePackages(map, pkg);
   return map;

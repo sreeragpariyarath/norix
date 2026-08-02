@@ -21,11 +21,7 @@ export async function handleReport(
   const analysis = analyze(scanResult);
   const doctor = includeDoctor ? runDoctor(analysis) : null;
 
-  const report = writeReports(
-    { format, outputDir, includeDoctor },
-    analysis,
-    doctor,
-  );
+  const report = writeReports({ format, outputDir, includeDoctor }, analysis, doctor);
 
   renderReportSuccess(report);
 }

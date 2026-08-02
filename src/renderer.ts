@@ -12,12 +12,7 @@
  */
 
 import pc from 'picocolors';
-import type {
-  AnalysisResult,
-  CapabilityCategory,
-  DoctorResult,
-  GeneratedReport,
-} from './types.js';
+import type { AnalysisResult, CapabilityCategory, DoctorResult, GeneratedReport } from './types.js';
 import { CATEGORY_LABELS, CATEGORY_ORDER } from './types.js';
 
 // ─── Formatting Constants ─────────────────────────────────────────────────────
@@ -56,10 +51,7 @@ function categoryTitle(category: string): string {
     packageManager: 'Package Manager',
     orm: 'ORM',
   };
-  return (
-    map[category] ??
-    category.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase())
-  );
+  return map[category] ?? category.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase());
 }
 
 /**
@@ -102,9 +94,7 @@ export function renderAnalysis(result: AnalysisResult): void {
   // ── Header ──────────────────────────────────────────────────────────────
   lines.push('');
   lines.push(
-    indent(
-      `${pc.cyan(pc.bold('norix'))}  ${pc.dim('·  Repository Analysis  ·  v1.0.0')}`,
-    ),
+    indent(`${pc.cyan(pc.bold('norix'))}  ${pc.dim('·  Repository Analysis  ·  v1.0.0')}`),
   );
   lines.push('');
   lines.push(rule());
@@ -120,10 +110,7 @@ export function renderAnalysis(result: AnalysisResult): void {
 
   if (result.isMonorepo) {
     const wsCount = result.workspaceNames.length;
-    const wsLabel =
-      wsCount > 0
-        ? `Monorepo  ${pc.dim(`(${wsCount} workspaces)`)}`
-        : 'Monorepo';
+    const wsLabel = wsCount > 0 ? `Monorepo  ${pc.dim(`(${wsCount} workspaces)`)}` : 'Monorepo';
     lines.push(row('Type', pc.white(wsLabel), labelWidth));
   }
 
@@ -135,9 +122,7 @@ export function renderAnalysis(result: AnalysisResult): void {
 
   if (activeCategories.length === 0) {
     lines.push(indent(pc.dim('  No known capabilities detected.')));
-    lines.push(
-      indent(pc.dim('  Ensure package.json dependencies are installed.')),
-    );
+    lines.push(indent(pc.dim('  Ensure package.json dependencies are installed.')));
   } else {
     for (const category of activeCategories) {
       const matches = result.capabilities[category];
@@ -148,9 +133,7 @@ export function renderAnalysis(result: AnalysisResult): void {
 
       // Yellow highlight if multiple tools share the same role
       const hasOverlap = matches.length > 1;
-      const valueRendered = hasOverlap
-        ? pc.yellow(valueText)
-        : pc.white(valueText);
+      const valueRendered = hasOverlap ? pc.yellow(valueText) : pc.white(valueText);
 
       lines.push(row(label, valueRendered, labelWidth));
     }
@@ -166,9 +149,7 @@ export function renderAnalysis(result: AnalysisResult): void {
       ? '1 package.json'
       : `${result.packageJsonCount} package.json files`;
 
-  lines.push(
-    indent(pc.dim(`${pkgLabel} scanned  ·  ${formatDuration(result.duration)}`)),
-  );
+  lines.push(indent(pc.dim(`${pkgLabel} scanned  ·  ${formatDuration(result.duration)}`)));
   lines.push('');
 
   process.stdout.write(lines.join('\n') + '\n');
@@ -181,11 +162,7 @@ export function renderDoctor(result: AnalysisResult, doctor: DoctorResult): void
 
   // ── Header ──────────────────────────────────────────────────────────────
   lines.push('');
-  lines.push(
-    indent(
-      `${pc.cyan(pc.bold('norix'))}  ${pc.dim('·  Repository Health  ·  v1.0.0')}`,
-    ),
-  );
+  lines.push(indent(`${pc.cyan(pc.bold('norix'))}  ${pc.dim('·  Repository Health  ·  v1.0.0')}`));
   lines.push('');
   lines.push(rule());
 
@@ -201,9 +178,7 @@ export function renderDoctor(result: AnalysisResult, doctor: DoctorResult): void
 
       const isWarning = finding.severity === 'warning';
       const icon = isWarning ? pc.yellow('⚠') : pc.cyan('ℹ');
-      const badge = isWarning
-        ? pc.yellow('[Warning]')
-        : pc.cyan('[Info]');
+      const badge = isWarning ? pc.yellow('[Warning]') : pc.cyan('[Info]');
 
       // Title line with severity badge
       const titleStr = `Potential Capability Overlap: ${categoryTitle(finding.category)}`;
@@ -232,12 +207,11 @@ export function renderDoctor(result: AnalysisResult, doctor: DoctorResult): void
 
   if (doctor.findings.length > 0) {
     const total = `${doctor.summary.total} finding${doctor.summary.total !== 1 ? 's' : ''}`;
-    const warn = doctor.summary.warning > 0
-      ? `${pc.yellow(`${doctor.summary.warning} warning${doctor.summary.warning !== 1 ? 's' : ''}`)}`
-      : null;
-    const info = doctor.summary.info > 0
-      ? `${pc.cyan(`${doctor.summary.info} info`)}`
-      : null;
+    const warn =
+      doctor.summary.warning > 0
+        ? `${pc.yellow(`${doctor.summary.warning} warning${doctor.summary.warning !== 1 ? 's' : ''}`)}`
+        : null;
+    const info = doctor.summary.info > 0 ? `${pc.cyan(`${doctor.summary.info} info`)}` : null;
 
     const parts = [total, warn, info].filter(Boolean);
     lines.push(indent(pc.dim(`${parts.join('  ·  ')}`)));
@@ -257,11 +231,7 @@ export function renderReportSuccess(report: GeneratedReport): void {
   const lines: string[] = [];
 
   lines.push('');
-  lines.push(
-    indent(
-      `${pc.cyan(pc.bold('norix'))}  ${pc.dim('·  Report Generated  ·  v0.5.0')}`,
-    ),
-  );
+  lines.push(indent(`${pc.cyan(pc.bold('norix'))}  ${pc.dim('·  Report Generated  ·  v0.5.0')}`));
   lines.push('');
   lines.push(rule());
   lines.push('');

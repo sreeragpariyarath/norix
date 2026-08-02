@@ -24,7 +24,7 @@ Run `norix` instantly without installation using `npx`:
 npx norix-cli
 ```
 
-*By default, this analyzes the current working directory.*
+_By default, this analyzes the current working directory._
 
 ## Example Output
 
@@ -57,7 +57,7 @@ npx norix-cli
 
 ## Why Norix
 
-When onboarding to a new codebase, auditing a repository, or setting up tooling, you need to quickly understand the project's stack. 
+When onboarding to a new codebase, auditing a repository, or setting up tooling, you need to quickly understand the project's stack.
 
 Traditional approaches require either manual inspection of dependency files or sharing code with remote API endpoints. `norix` solves this locally and instantly with zero configuration. It parses package definitions and metadata, compares them against a built-in technology registry, and outputs a clear hierarchy of the project's capabilities.
 
@@ -86,19 +86,25 @@ yarn global add norix-cli
 `norix` provides three main commands: `analyze`, `doctor`, and `report`.
 
 ### 1. Analyze the Stack
+
 Shows the high-level repository overview and detected capabilities.
+
 ```bash
 norix analyze [options]
 ```
 
 ### 2. Check Repository Health
+
 Scans the project for potential capability overlaps (e.g. multiple loggers or HTTP clients).
+
 ```bash
 norix doctor [options]
 ```
 
 ### 3. Generate Reports
+
 Export the analysis results to Markdown or JSON formats for documentation or automated tooling.
+
 ```bash
 norix report [options]
 ```
@@ -107,24 +113,24 @@ norix report [options]
 
 `norix` recognizes a broad set of tools across different categories:
 
-| Category | Examples / Supported Packages |
-| :--- | :--- |
-| **Framework** | Next.js, Express, NestJS, Fastify, Hono, Remix, Astro, SvelteKit, Elysia, React, Vue, Angular |
-| **Database** | PostgreSQL, MySQL, MongoDB, SQLite, Supabase, Neon, Turso |
-| **ORM** | Prisma, Drizzle, TypeORM, Sequelize, Mongoose, Kysely |
-| **Validation** | Zod, Yup, Joi, Valibot, class-validator, ArkType |
-| **Auth** | Auth.js, Clerk, Lucia, Better Auth, Passport.js |
-| **Cache** | Redis, ioredis, Upstash Redis, LRU Cache |
-| **Queue** | BullMQ, pg-boss, Kafka, Inngest, Trigger.dev |
-| **Storage** | AWS S3, Cloudinary, UploadThing, Vercel Blob |
-| **Email** | Resend, Nodemailer, SendGrid, React Email |
-| **Payments** | Stripe, Lemon Squeezy, Razorpay, PayPal |
-| **Testing** | Vitest, Jest, Playwright, Cypress, Testing Library |
-| **HTTP Client** | Axios, Got, ky, undici |
-| **Date** | date-fns, Day.js, Moment.js, Luxon |
-| **Logging** | Pino, Winston, Consola |
-| **Docs** | Storybook, VitePress, Docusaurus, TypeDoc |
-| **Build** | Vite, Webpack, esbuild, Turborepo, Nx |
+| Category        | Examples / Supported Packages                                                                 |
+| :-------------- | :-------------------------------------------------------------------------------------------- |
+| **Framework**   | Next.js, Express, NestJS, Fastify, Hono, Remix, Astro, SvelteKit, Elysia, React, Vue, Angular |
+| **Database**    | PostgreSQL, MySQL, MongoDB, SQLite, Supabase, Neon, Turso                                     |
+| **ORM**         | Prisma, Drizzle, TypeORM, Sequelize, Mongoose, Kysely                                         |
+| **Validation**  | Zod, Yup, Joi, Valibot, class-validator, ArkType                                              |
+| **Auth**        | Auth.js, Clerk, Lucia, Better Auth, Passport.js                                               |
+| **Cache**       | Redis, ioredis, Upstash Redis, LRU Cache                                                      |
+| **Queue**       | BullMQ, pg-boss, Kafka, Inngest, Trigger.dev                                                  |
+| **Storage**     | AWS S3, Cloudinary, UploadThing, Vercel Blob                                                  |
+| **Email**       | Resend, Nodemailer, SendGrid, React Email                                                     |
+| **Payments**    | Stripe, Lemon Squeezy, Razorpay, PayPal                                                       |
+| **Testing**     | Vitest, Jest, Playwright, Cypress, Testing Library                                            |
+| **HTTP Client** | Axios, Got, ky, undici                                                                        |
+| **Date**        | date-fns, Day.js, Moment.js, Luxon                                                            |
+| **Logging**     | Pino, Winston, Consola                                                                        |
+| **Docs**        | Storybook, VitePress, Docusaurus, TypeDoc                                                     |
+| **Build**       | Vite, Webpack, esbuild, Turborepo, Nx                                                         |
 
 ## JSON Output
 
@@ -161,6 +167,7 @@ norix analyze --json
 ## Monorepo Support
 
 `norix` detects workspace layouts automatically by scanning for:
+
 - `package.json` workspaces (`workspaces` array or object)
 - `pnpm-workspace.yaml` files
 - Workspace-level tools (`turbo.json`, `nx.json`, `lerna.json`)

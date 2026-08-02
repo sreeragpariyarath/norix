@@ -161,9 +161,7 @@ function buildFinding(
     title: `Potential Capability Overlap: ${roleLabel} (${names})`,
     severity: rule.severity,
     category: rule.category,
-    evidence: roleMatches.flatMap((m) =>
-      m.matchedPackages.map((pkg) => ({ package: pkg })),
-    ),
+    evidence: roleMatches.flatMap((m) => m.matchedPackages.map((pkg) => ({ package: pkg }))),
     reasoning: rule.reasoning,
   };
 }

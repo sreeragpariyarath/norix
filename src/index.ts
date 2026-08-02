@@ -84,21 +84,14 @@ async function main(): Promise<void> {
   const outputDir = typeof values.output === 'string' ? resolve(values.output) : cwd;
   const noDoctor = Boolean(values['no-doctor']);
 
-  if (
-    command === 'doctor' &&
-    !['warning', 'info', 'all'].includes(severityStr)
-  ) {
-    renderError(
-      `Invalid --severity value: "${severityStr}". Valid values: warning, info, all`,
-    );
+  if (command === 'doctor' && !['warning', 'info', 'all'].includes(severityStr)) {
+    renderError(`Invalid --severity value: "${severityStr}". Valid values: warning, info, all`);
     process.exit(2);
   }
 
   const validFormats = ['markdown', 'json', 'all'];
   if (command === 'report' && !validFormats.includes(formatStr)) {
-    renderError(
-      `Invalid --format value: "${formatStr}". Valid values: markdown, json, all`,
-    );
+    renderError(`Invalid --format value: "${formatStr}". Valid values: markdown, json, all`);
     process.exit(2);
   }
 
@@ -115,19 +108,12 @@ async function main(): Promise<void> {
       }
 
       case 'report': {
-        await handleReport(
-          cwd,
-          formatStr as ReportFormat,
-          outputDir,
-          !noDoctor,
-        );
+        await handleReport(cwd, formatStr as ReportFormat, outputDir, !noDoctor);
         break;
       }
 
       default: {
-        renderError(
-          `Unknown command: "${command}". Run 'norix --help' to see available commands.`,
-        );
+        renderError(`Unknown command: "${command}". Run 'norix --help' to see available commands.`);
         process.exit(1);
       }
     }

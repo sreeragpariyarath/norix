@@ -11,12 +11,7 @@
  */
 
 import { DB } from './db/index.js';
-import type {
-  AnalysisResult,
-  CapabilityCategory,
-  CapabilityMatch,
-  ScanResult,
-} from './types.js';
+import type { AnalysisResult, CapabilityCategory, CapabilityMatch, ScanResult } from './types.js';
 import { CATEGORY_ORDER } from './types.js';
 
 export function analyze(scan: ScanResult): AnalysisResult {
@@ -32,9 +27,7 @@ export function analyze(scan: ScanResult): AnalysisResult {
 
     for (const entry of entries) {
       // Check if any of the declared packages are installed
-      const matchedPackages = entry.packages.filter((pkg) =>
-        installedPackages.has(pkg),
-      );
+      const matchedPackages = entry.packages.filter((pkg) => installedPackages.has(pkg));
 
       if (matchedPackages.length === 0) continue;
 

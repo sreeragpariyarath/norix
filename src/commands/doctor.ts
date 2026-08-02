@@ -42,9 +42,7 @@ export async function handleDoctor(
 
   // Filter findings by severity
   const filteredFindings =
-    severity === 'all'
-      ? doctor.findings
-      : doctor.findings.filter((f) => f.severity === severity);
+    severity === 'all' ? doctor.findings : doctor.findings.filter((f) => f.severity === severity);
 
   const filteredDoctor: DoctorResult = {
     ...doctor,
@@ -57,9 +55,7 @@ export async function handleDoctor(
   };
 
   if (asJson) {
-    process.stdout.write(
-      JSON.stringify(toJson(analysis, filteredDoctor, version), null, 2) + '\n',
-    );
+    process.stdout.write(JSON.stringify(toJson(analysis, filteredDoctor, version), null, 2) + '\n');
   } else {
     renderDoctor(analysis, filteredDoctor);
   }
