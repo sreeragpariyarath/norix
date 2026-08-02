@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.0](https://github.com/sreeragpariyarath/norix/compare/v1.12.0...v1.13.0) (2026-08-02)
+
+
+### Features
+
+* **benchmark:** add performance benchmarking and profiling suite ([aa406af](https://github.com/sreeragpariyarath/norix/commit/aa406afa3bc7c0ba63c8aea61cb3a9a96e799083))
+
 ## [1.12.0](https://github.com/sreeragpariyarath/norix/compare/v1.11.0...v1.12.0) (2026-08-02)
 
 
