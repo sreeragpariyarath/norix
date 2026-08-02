@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.15.0](https://github.com/sreeragpariyarath/norix/compare/v1.14.1...v1.15.0) (2026-08-02)
+
+
+### Features
+
+* add AI-ready project insights engine (PR [#16](https://github.com/sreeragpariyarath/norix/issues/16)) ([d9e632c](https://github.com/sreeragpariyarath/norix/commit/d9e632cdf8e1c48e5ec77343c516769178f845d5))
+
 ## [1.14.1](https://github.com/sreeragpariyarath/norix/compare/v1.14.0...v1.14.1) (2026-08-02)
 
 
