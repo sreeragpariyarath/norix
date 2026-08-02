@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/sreeragpariyarath/norix/compare/v1.3.0...v1.4.0) (2026-08-02)
+
+
+### Features
+
+* **engine:** implement concrete domain readers with memory cache integration ([637f5d1](https://github.com/sreeragpariyarath/norix/commit/637f5d12261570beabd7c7d755d31634dbe6e0f5))
+
 ## [1.3.0](https://github.com/sreeragpariyarath/norix/compare/v1.2.0...v1.3.0) (2026-08-02)
 
 
