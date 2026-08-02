@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/sreeragpariyarath/norix/compare/v1.4.0...v1.5.0) (2026-08-02)
+
+
+### Features
+
+* **engine:** implement scoring engine, factory instantiator, and sequential registry runner ([d5a1984](https://github.com/sreeragpariyarath/norix/commit/d5a198473b489d6fce898750b526c65dbfc59819))
+
 ## [1.4.0](https://github.com/sreeragpariyarath/norix/compare/v1.3.0...v1.4.0) (2026-08-02)
 
 
