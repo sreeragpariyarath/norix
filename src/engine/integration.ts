@@ -23,12 +23,19 @@ export async function runNewEngine(
 ): Promise<AnalysisResult> {
   const cache = options?.cache ?? new EvidenceCache();
 
-  // Pre-seed package.json manifest in cache for in-memory scan results and unit tests
+  // Pre-seed package.json manifest in cache, partitioned by devDependency status.
+  // This mirrors the actual package.json structure so detectors using hasPackage()
+  // see both dependencies and devDependencies correctly.
   const dependencies: Record<string, string> = {};
+  const devDependencies: Record<string, string> = {};
   for (const [name, info] of scanResult.allPackages.entries()) {
-    dependencies[name] = info.version;
+    if (info.isDev) {
+      devDependencies[name] = info.version;
+    } else {
+      dependencies[name] = info.version;
+    }
   }
-  cache.getJson('package.json', () => ({ dependencies }));
+  cache.getJson('package.json', () => ({ dependencies, devDependencies }));
 
   const context = new EvidenceContextImpl(scanResult.repoRoot, new Set<string>(), cache);
 
@@ -84,6 +91,11 @@ export async function runNewEngine(
       nx: ['nx'],
       lerna: ['lerna'],
       'cloudflare-workers': ['@cloudflare/workers-types'],
+      vitest: ['vitest'],
+      jest: ['jest'],
+      playwright: ['@playwright/test', 'playwright'],
+      cypress: ['cypress'],
+      mocha: ['mocha'],
     };
 
     const pkgs = detectorPackages[result.detectorId] || [];
@@ -133,6 +145,11 @@ export async function runNewEngine(
       'docker-compose': 'orchestrator',
       kubernetes: 'orchestrator',
       helm: 'package-manager',
+      vitest: 'test-runner',
+      jest: 'test-runner',
+      playwright: 'e2e-testing',
+      cypress: 'e2e-testing',
+      mocha: 'test-runner',
     };
 
     const r = detectorRoles[result.detectorId];

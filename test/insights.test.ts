@@ -35,13 +35,18 @@ import type { ArchitectureReport, ProjectProfile } from '../src/insights/types.j
  */
 function createMockScan(
   packages: Record<string, string>,
-  options: Partial<
-    Pick<ScanResult, 'language' | 'isMonorepo' | 'workspaceNames' | 'repoName'>
-  > = {},
+  options: Partial<Pick<ScanResult, 'language' | 'isMonorepo' | 'workspaceNames' | 'repoName'>> & {
+    devPackages?: Record<string, string>;
+  } = {},
 ): ScanResult {
   const allPackages = new Map<string, { version: string; isDev: boolean }>();
   for (const [name, version] of Object.entries(packages)) {
     allPackages.set(name, { version, isDev: false });
+  }
+  if (options.devPackages) {
+    for (const [name, version] of Object.entries(options.devPackages)) {
+      allPackages.set(name, { version, isDev: true });
+    }
   }
   return {
     repoName: options.repoName ?? 'test-repo',
@@ -590,5 +595,52 @@ describe('ReportMetadata', () => {
     const report = analyzeAndInsight({});
     const date = new Date(report.metadata.generatedAt);
     expect(date.toISOString()).toBe(report.metadata.generatedAt);
+  });
+});
+
+// ─── Tests: Development Dependencies Detection (PR #16.1) ──────────────────────
+
+describe('InsightEngine – devDependencies testing framework detection', () => {
+  it('detects Vitest when present in devDependencies', () => {
+    const scan = createMockScan({}, { devPackages: { vitest: '1.0.0' } });
+    const result = analyze(scan);
+    const engine = new InsightEngine();
+    const report = engine.generate(result, 10, 'v1.0.0');
+
+    const strengthTitles = report.strengths.map((s) => s.title);
+    expect(strengthTitles).toContain('Test suite configured');
+
+    const recIds = report.recommendations.map((r) => r.id);
+    expect(recIds).not.toContain('no-testing');
+  });
+
+  it('detects Jest when present in devDependencies', () => {
+    const scan = createMockScan({}, { devPackages: { jest: '29.0.0' } });
+    const result = analyze(scan);
+    const engine = new InsightEngine();
+    const report = engine.generate(result, 10, 'v1.0.0');
+
+    const strengthTitles = report.strengths.map((s) => s.title);
+    expect(strengthTitles).toContain('Test suite configured');
+  });
+
+  it('detects Playwright when present in devDependencies', () => {
+    const scan = createMockScan({}, { devPackages: { '@playwright/test': '1.40.0' } });
+    const result = analyze(scan);
+    const engine = new InsightEngine();
+    const report = engine.generate(result, 10, 'v1.0.0');
+
+    const strengthTitles = report.strengths.map((s) => s.title);
+    expect(strengthTitles).toContain('Test suite configured');
+  });
+
+  it('detects Cypress when present in devDependencies', () => {
+    const scan = createMockScan({}, { devPackages: { cypress: '13.0.0' } });
+    const result = analyze(scan);
+    const engine = new InsightEngine();
+    const report = engine.generate(result, 10, 'v1.0.0');
+
+    const strengthTitles = report.strengths.map((s) => s.title);
+    expect(strengthTitles).toContain('Test suite configured');
   });
 });

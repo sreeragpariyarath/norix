@@ -36,6 +36,11 @@ import { NetlifyDetector } from '../detectors/NetlifyDetector.js';
 import { RailwayDetector } from '../detectors/RailwayDetector.js';
 import { RenderDetector } from '../detectors/RenderDetector.js';
 import { CloudflareWorkersDetector } from '../detectors/CloudflareWorkersDetector.js';
+import { VitestDetector } from '../detectors/VitestDetector.js';
+import { JestDetector } from '../detectors/JestDetector.js';
+import { PlaywrightDetector } from '../detectors/PlaywrightDetector.js';
+import { CypressDetector } from '../detectors/CypressDetector.js';
+import { MochaDetector } from '../detectors/MochaDetector.js';
 
 /**
  * Creates and returns a pre-registered DetectorFactory containing all capability detectors.
@@ -79,5 +84,10 @@ export function createDefaultFactory(): DetectorFactory {
   factory.register('railway', RailwayDetector);
   factory.register('render', RenderDetector);
   factory.register('cloudflare-workers', CloudflareWorkersDetector);
+  factory.register('vitest', VitestDetector);
+  factory.register('jest', JestDetector);
+  factory.register('playwright', PlaywrightDetector);
+  factory.register('cypress', CypressDetector);
+  factory.register('mocha', MochaDetector);
   return factory;
 }
