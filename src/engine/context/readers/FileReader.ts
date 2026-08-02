@@ -19,6 +19,14 @@ export interface FileReader {
   getFileContent(path: string): Promise<string | null>;
 
   /**
+   * Reads raw string content of a file synchronously.
+   *
+   * @param path Relative path to the file
+   * @returns The file content string, or null if missing
+   */
+  getFileContentSync(path: string): string | null;
+
+  /**
    * Verifies if a file content matches a regular expression pattern.
    *
    * @param path Relative path to the file
