@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.1](https://github.com/sreeragpariyarath/norix/compare/v1.14.0...v1.14.1) (2026-08-02)
+
+
+### Bug Fixes
+
+* pin typescript to ~5.7.2 to prevent incompatible major bumps ([7238fda](https://github.com/sreeragpariyarath/norix/commit/7238fdad321e44d7c70247ee699de52022741324))
+
 ## [1.14.0](https://github.com/sreeragpariyarath/norix/compare/v1.13.0...v1.14.0) (2026-08-02)
 
 
