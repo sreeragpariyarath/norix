@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.0](https://github.com/sreeragpariyarath/norix/compare/v1.8.0...v1.9.0) (2026-08-02)
+
+
+### Features
+
+* **engine:** migrate database and ORM capability detectors ([2bd29af](https://github.com/sreeragpariyarath/norix/commit/2bd29afd991767921a4110ad0458d6132541f80c))
+
 ## [1.8.0](https://github.com/sreeragpariyarath/norix/compare/v1.7.0...v1.8.0) (2026-08-02)
 
 
