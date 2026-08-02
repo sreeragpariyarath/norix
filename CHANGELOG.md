@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.1](https://github.com/sreeragpariyarath/norix/compare/v1.16.0...v1.16.1) (2026-08-02)
+
+
+### Bug Fixes
+
+* **test:** import GraphFormat type in graph.test.ts ([45ff6da](https://github.com/sreeragpariyarath/norix/commit/45ff6dacad28d9675d1d6c45495e7e5a2b4082e8))
+
 ## [1.16.0](https://github.com/sreeragpariyarath/norix/compare/v1.15.1...v1.16.0) (2026-08-02)
 
 
