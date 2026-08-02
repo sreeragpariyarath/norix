@@ -23,17 +23,17 @@
 
 ### Databases
 
-- [ ] PostgreSQL
-- [ ] MySQL
-- [ ] MongoDB
-- [ ] SQLite
+- [x] PostgreSQL
+- [x] MySQL
+- [x] MongoDB
+- [x] SQLite
 
 ### ORM
 
-- [ ] Prisma
-- [ ] Drizzle
-- [ ] TypeORM
-- [ ] Mongoose
+- [x] Prisma
+- [x] Drizzle
+- [x] TypeORM
+- [x] Mongoose
 
 ### DevOps
 
