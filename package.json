@@ -1,6 +1,6 @@
 {
   "name": "norix-cli",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Repository Analysis CLI — understand your codebase instantly",
   "type": "module",
   "bin": {
