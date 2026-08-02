@@ -123,6 +123,37 @@ describe('Real Repository Fixture Validation', () => {
         2,
       ),
     );
+
+    // 8. docker-app
+    const dockerDir = join(FIXTURES_ROOT, 'docker-app');
+    ensureDir(dockerDir);
+    writeFileSync(
+      join(dockerDir, 'package.json'),
+      JSON.stringify({ name: 'docker-app', dependencies: {} }, null, 2),
+    );
+    writeFileSync(join(dockerDir, 'Dockerfile'), 'FROM node:20');
+    writeFileSync(join(dockerDir, 'docker-compose.yml'), 'version: "3.8"\nservices: {}');
+
+    // 9. monorepo-pnpm
+    const pnpmDir = join(FIXTURES_ROOT, 'monorepo-pnpm');
+    ensureDir(pnpmDir);
+    writeFileSync(
+      join(pnpmDir, 'package.json'),
+      JSON.stringify({ name: 'monorepo-pnpm', dependencies: {} }, null, 2),
+    );
+    writeFileSync(join(pnpmDir, 'pnpm-workspace.yaml'), 'packages:\n  - "packages/*"');
+    writeFileSync(join(pnpmDir, 'pnpm-lock.yaml'), '# mock lockfile');
+
+    // 10. deployment-platforms
+    const deployDir = join(FIXTURES_ROOT, 'deploy-app');
+    ensureDir(deployDir);
+    writeFileSync(
+      join(deployDir, 'package.json'),
+      JSON.stringify({ name: 'deploy-app', dependencies: {} }, null, 2),
+    );
+    writeFileSync(join(deployDir, 'railway.json'), '{}');
+    writeFileSync(join(deployDir, 'render.yaml'), 'services: []');
+    writeFileSync(join(deployDir, 'wrangler.toml'), 'name = "worker"');
   });
 
   afterAll(() => {
@@ -204,5 +235,56 @@ describe('Real Repository Fixture Validation', () => {
     const newAnalysis = await runNewEngine(scanResult);
 
     expect(newAnalysis.capabilities.build).toEqual(legacyAnalysis.capabilities.build);
+  });
+
+  it('should validate and confirm modern infrastructure detections on docker-app', async () => {
+    const root = join(FIXTURES_ROOT, 'docker-app');
+    const scanResult = await scan(root);
+
+    const legacyAnalysis = analyze(scanResult);
+    const newAnalysis = await runNewEngine(scanResult);
+
+    // Legacy analyzer matches nothing since it has no package dependencies
+    expect(legacyAnalysis.capabilities).toEqual({});
+
+    // Modern engine detects Docker and Docker Compose
+    expect(newAnalysis.capabilities.container).toBeDefined();
+    const containerCaps = newAnalysis.capabilities.container!;
+    expect(containerCaps.some((c) => c.label === 'Docker')).toBe(true);
+    expect(containerCaps.some((c) => c.label === 'Docker Compose')).toBe(true);
+  });
+
+  it('should validate and confirm modern infrastructure detections on monorepo-pnpm', async () => {
+    const root = join(FIXTURES_ROOT, 'monorepo-pnpm');
+    const scanResult = await scan(root);
+
+    const legacyAnalysis = analyze(scanResult);
+    const newAnalysis = await runNewEngine(scanResult);
+
+    // Legacy analyzer matches nothing
+    expect(legacyAnalysis.capabilities).toEqual({});
+
+    // Modern engine detects pnpm package manager
+    expect(newAnalysis.capabilities.build).toBeDefined();
+    const buildCaps = newAnalysis.capabilities.build!;
+    expect(buildCaps.some((c) => c.label === 'pnpm')).toBe(true);
+  });
+
+  it('should validate and confirm modern deployments on deploy-app', async () => {
+    const root = join(FIXTURES_ROOT, 'deploy-app');
+    const scanResult = await scan(root);
+
+    const legacyAnalysis = analyze(scanResult);
+    const newAnalysis = await runNewEngine(scanResult);
+
+    // Legacy analyzer matches nothing
+    expect(legacyAnalysis.capabilities).toEqual({});
+
+    // Modern engine detects Railway, Render, and Cloudflare Workers
+    expect(newAnalysis.capabilities.cloud).toBeDefined();
+    const cloudCaps = newAnalysis.capabilities.cloud!;
+    expect(cloudCaps.some((c) => c.label === 'Railway')).toBe(true);
+    expect(cloudCaps.some((c) => c.label === 'Render')).toBe(true);
+    expect(cloudCaps.some((c) => c.label === 'Cloudflare Workers')).toBe(true);
   });
 });

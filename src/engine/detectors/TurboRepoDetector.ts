@@ -4,12 +4,13 @@ import { Evidence, EvidenceType, EvidenceSourceType } from '../types/Evidence.js
 import { EvidenceContext } from '../context/EvidenceContext.js';
 
 const WEIGHTS = {
-  TURBO_DEPENDENCY: 1.0,
+  TURBO_DEPENDENCY: 0.8,
+  TURBO_CONFIG: 1.0,
 };
 
 /**
  * Capability detector for Turborepo.
- * Gathers evidence based on package declarations.
+ * Gathers evidence based on config file and package declarations.
  */
 export class TurboRepoDetector implements Detector {
   readonly id = 'turborepo';
@@ -35,6 +36,15 @@ export class TurboRepoDetector implements Detector {
 
       const v = context.node.getPackageVersion('turbo');
       if (v) version = v;
+    }
+
+    if (context.fileSystem.hasFile('turbo.json')) {
+      evidence.push({
+        type: EvidenceType.FilePresence,
+        source: { type: EvidenceSourceType.Config, name: 'turbo.json' },
+        message: 'Found Turborepo configuration file "turbo.json"',
+        weight: WEIGHTS.TURBO_CONFIG,
+      });
     }
 
     const result: { evidence: Evidence[]; version?: string } = { evidence };

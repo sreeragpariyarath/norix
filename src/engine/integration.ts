@@ -62,6 +62,8 @@ export async function runNewEngine(scanResult: ScanResult): Promise<AnalysisResu
       mongoose: ['mongoose'],
       turborepo: ['turbo'],
       nx: ['nx'],
+      lerna: ['lerna'],
+      'cloudflare-workers': ['@cloudflare/workers-types'],
     };
 
     const pkgs = detectorPackages[result.detectorId] || [];
@@ -93,6 +95,24 @@ export async function runNewEngine(scanResult: ScanResult): Promise<AnalysisResu
       mongoose: 'document-orm',
       turborepo: 'monorepo-tool',
       nx: 'monorepo-tool',
+      lerna: 'monorepo-tool',
+      npm: 'package-manager',
+      pnpm: 'package-manager',
+      yarn: 'package-manager',
+      bun: 'package-manager',
+      'github-actions': 'ci-cd',
+      'gitlab-ci': 'ci-cd',
+      'circle-ci': 'ci-cd',
+      'azure-pipelines': 'ci-cd',
+      vercel: 'deployment-platform',
+      netlify: 'deployment-platform',
+      railway: 'deployment-platform',
+      render: 'deployment-platform',
+      'cloudflare-workers': 'deployment-platform',
+      docker: 'containerizer',
+      'docker-compose': 'orchestrator',
+      kubernetes: 'orchestrator',
+      helm: 'package-manager',
     };
 
     const r = detectorRoles[result.detectorId];
