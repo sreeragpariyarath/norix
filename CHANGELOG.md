@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/sreeragpariyarath/norix/compare/v1.5.0...v1.6.0) (2026-08-02)
+
+
+### Features
+
+* **engine:** migrate Next.js capability detector to the new execution pipeline ([336eba1](https://github.com/sreeragpariyarath/norix/commit/336eba1f84f5b41a0c824f4ce06de623bb8602b3))
+
 ## [1.5.0](https://github.com/sreeragpariyarath/norix/compare/v1.4.0...v1.5.0) (2026-08-02)
 
 
