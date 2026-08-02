@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.0](https://github.com/sreeragpariyarath/norix/compare/v1.15.1...v1.16.0) (2026-08-02)
+
+
+### Features
+
+* **graph:** add architecture graph visualization and renderers (PR [#17](https://github.com/sreeragpariyarath/norix/issues/17)) ([86831ac](https://github.com/sreeragpariyarath/norix/commit/86831ac1a3765585f36f8fdd1073ed0ec3bf66f9))
+
 ## [1.15.1](https://github.com/sreeragpariyarath/norix/compare/v1.15.0...v1.15.1) (2026-08-02)
 
 
