@@ -17,9 +17,9 @@
 
 ### Backend
 
-- [ ] Express
-- [ ] NestJS
-- [ ] Fastify
+- [x] Express
+- [x] NestJS
+- [x] Fastify
 
 ### Databases
 
