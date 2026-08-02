@@ -58,6 +58,13 @@ export class DetectorFactory {
   }
 
   /**
+   * Retrieves all registered detector constructors.
+   */
+  getConstructors(): readonly DetectorConstructor[] {
+    return Array.from(this.registry.values());
+  }
+
+  /**
    * Clears all registered constructor entries.
    */
   clear(): void {

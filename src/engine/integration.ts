@@ -3,15 +3,25 @@ import { EvidenceCache } from './cache/EvidenceCache.js';
 import { EvidenceContextImpl } from './context/EvidenceContextImpl.js';
 import { DetectorRegistry } from './registry/DetectorRegistry.js';
 import { createDefaultFactory } from './registry/loader.js';
+import { DetectorFactory, DetectorConstructor } from './registry/DetectorFactory.js';
+
+export interface EngineOptions {
+  readonly detectorConstructors?: readonly DetectorConstructor[];
+  readonly cache?: EvidenceCache;
+}
 
 /**
  * Executes the new capability detection engine and maps the results to the legacy AnalysisResult format.
  *
  * @param scanResult The repository raw ScanResult
+ * @param options Engine execution options (custom constructors/cache)
  * @returns Fully populated legacy-compatible AnalysisResult
  */
-export async function runNewEngine(scanResult: ScanResult): Promise<AnalysisResult> {
-  const cache = new EvidenceCache();
+export async function runNewEngine(
+  scanResult: ScanResult,
+  options?: EngineOptions,
+): Promise<AnalysisResult> {
+  const cache = options?.cache ?? new EvidenceCache();
 
   // Pre-seed package.json manifest in cache for in-memory scan results and unit tests
   const dependencies: Record<string, string> = {};
@@ -22,7 +32,17 @@ export async function runNewEngine(scanResult: ScanResult): Promise<AnalysisResu
 
   const context = new EvidenceContextImpl(scanResult.repoRoot, new Set<string>(), cache);
 
-  const factory = createDefaultFactory();
+  let factory: DetectorFactory;
+  if (options?.detectorConstructors) {
+    factory = new DetectorFactory();
+    for (const ctor of options.detectorConstructors) {
+      const temp = new ctor();
+      factory.register(temp.id, ctor);
+    }
+  } else {
+    factory = createDefaultFactory();
+  }
+
   const registry = new DetectorRegistry();
   registry.add(factory.createAll());
 

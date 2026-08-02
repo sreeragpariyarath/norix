@@ -4,7 +4,7 @@
 
 import { parseArgs } from 'node:util';
 import { resolve } from 'node:path';
-import { handleAnalyze, handleDoctor, handleReport } from './commands/index.js';
+import { handleAnalyze, handleDoctor, handleReport, handlePlugins } from './commands/index.js';
 import { renderError } from './renderer.js';
 import type { ReportFormat } from './types.js';
 
@@ -20,6 +20,7 @@ const HELP = `
     analyze          Show repository overview  (default)
     doctor           Show repository health and capability overlaps
     report           Generate Markdown and JSON reports
+    plugins          Show installed third-party detector plugins
 
   Global Options:
     --cwd <path>     Set working directory  (default: current directory)
@@ -131,6 +132,11 @@ async function main(): Promise<void> {
 
       case 'report': {
         await handleReport(cwd, formatStr as ReportFormat, outputDir, !noDoctor);
+        break;
+      }
+
+      case 'plugins': {
+        await handlePlugins(cwd, VERSION);
         break;
       }
 

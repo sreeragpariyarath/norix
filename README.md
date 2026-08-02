@@ -234,6 +234,52 @@ npm run build
 node dist/index.js analyze
 ```
 
+## Detector Plugin System
+
+Norix features a dynamic plugin architecture, enabling third-party packages to register custom capability detectors without modifying the core CLI source code.
+
+### 1. Configuration
+
+Add a configuration file to your repository root named `norix.config.json` (or `norix.config.js` / `norix.config.mjs`) containing the paths to your plugins:
+
+```json
+{
+  "plugins": ["./plugins/flutter-plugin", "@company/custom-detectors"]
+}
+```
+
+### 2. Creating a Plugin
+
+A Norix plugin is a standard JavaScript module that default-exports (or named-exports as `plugin`) an object implementing the `NorixPlugin` interface:
+
+```typescript
+import { NorixPlugin } from 'norix-cli';
+import { MyCustomDetector } from './MyCustomDetector.js';
+
+const myPlugin: NorixPlugin = {
+  name: 'My Custom Plugin',
+  version: '1.0.0',
+  norix: '^1.0.0 || ^2.0.0',
+  description: 'Detects internal custom frameworks and tools',
+  homepage: 'https://github.com/my-org/custom-plugin',
+  register(registry) {
+    registry.registerDetector(this, MyCustomDetector);
+  },
+};
+
+export default myPlugin;
+```
+
+A custom detector class simply implements the standard `Detector` interface. For a complete reference implementation, check the [examples/flutter-plugin/](file:///c:/Me/packages/norix/examples/flutter-plugin) directory.
+
+### 3. CLI Command
+
+To view all currently active core detectors and loaded third-party plugins:
+
+```bash
+norix plugins
+```
+
 ## Performance Benchmarking
 
 Norix includes a performance benchmarking suite to measure and analyze execution times, memory usage, cache hit rates, and individual detector efficiency.
