@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.11.0](https://github.com/sreeragpariyarath/norix/compare/v1.10.0...v1.11.0) (2026-08-02)
+
+
+### Features
+
+* **cli:** integrate new modern detection engine behind --engine=new flag ([c45a204](https://github.com/sreeragpariyarath/norix/commit/c45a204b707e7c3a9f40878924258c4c76b49974))
+* **engine:** migrate and enhance infrastructure capability detectors ([fa9fcf0](https://github.com/sreeragpariyarath/norix/commit/fa9fcf0c31725838414b8cb83a8576dff33b9ce4))
+* **engine:** migrate infrastructure capability detectors ([a51e810](https://github.com/sreeragpariyarath/norix/commit/a51e81050a3a3a01556d86acbfcac86fdbba2cbf))
+
 ## [1.10.0](https://github.com/sreeragpariyarath/norix/compare/v1.9.0...v1.10.0) (2026-08-02)
 
 
