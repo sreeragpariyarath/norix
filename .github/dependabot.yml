@@ -5,6 +5,11 @@ updates:
     schedule:
       interval: 'weekly'
     open-pull-requests-limit: 3
+    ignore:
+      # typescript-eslint@8.x requires typescript <6.1.0.
+      # Block major/minor TS bumps until typescript-eslint explicitly supports the new range.
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major', 'version-update:semver-minor']
 
   - package-ecosystem: 'github-actions'
     directory: '/'
