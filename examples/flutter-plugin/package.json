@@ -1,0 +1,17 @@
+{
+  "name": "norix-flutter-plugin",
+  "version": "1.0.0",
+  "description": "Detects Flutter projects",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --clean"
+  },
+  "peerDependencies": {
+    "norix-cli": "*"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2"
+  }
+}
