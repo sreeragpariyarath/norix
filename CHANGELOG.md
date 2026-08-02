@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.14.0](https://github.com/sreeragpariyarath/norix/compare/v1.13.0...v1.14.0) (2026-08-02)
+
+
+### Features
+
+* add detector plugin system ([37051d8](https://github.com/sreeragpariyarath/norix/commit/37051d8f620589a134f325f1240316be11690832))
+* **examples:** add flutter-plugin example with correct Evidence types ([938e92b](https://github.com/sreeragpariyarath/norix/commit/938e92bb62772e791f3927a2d395d2ce7ab3dabe))
+
 ## [1.13.0](https://github.com/sreeragpariyarath/norix/compare/v1.12.0...v1.13.0) (2026-08-02)
 
 
