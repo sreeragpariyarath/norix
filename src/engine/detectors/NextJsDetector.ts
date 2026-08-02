@@ -3,6 +3,13 @@ import { CapabilityCategory } from '../types/Capability.js';
 import { Evidence, EvidenceType, EvidenceSourceType } from '../types/Evidence.js';
 import { EvidenceContext } from '../context/EvidenceContext.js';
 
+const WEIGHTS = {
+  DEPENDENCY: 0.8,
+  CONFIG: 0.9,
+  ROUTER: 0.5,
+  ENV: 0.6,
+};
+
 /**
  * Capability detector for the Next.js framework.
  * Gathers evidence across manifests, file presence, and configuration files.
@@ -13,13 +20,16 @@ export class NextJsDetector implements Detector {
   readonly category = CapabilityCategory.Framework;
   readonly role = 'meta-framework';
   readonly threshold = 0.3;
-  readonly versionQuery = 'next';
 
   /**
    * Scans the repository context and gathers items of evidence of Next.js.
    */
-  async detect(context: EvidenceContext): Promise<Evidence[]> {
+  async detect(context: EvidenceContext): Promise<{
+    evidence: Evidence[];
+    version?: string;
+  }> {
     const evidence: Evidence[] = [];
+    let version: string | undefined;
 
     // 1. Dependency matching
     if (context.node.hasPackage('next')) {
@@ -27,8 +37,11 @@ export class NextJsDetector implements Detector {
         type: EvidenceType.Dependency,
         source: { type: EvidenceSourceType.Manifest, name: 'package.json' },
         message: 'Found "next" in package.json dependencies',
-        weight: 0.8,
+        weight: WEIGHTS.DEPENDENCY,
       });
+
+      const v = context.node.getPackageVersion('next');
+      if (v) version = v;
     }
 
     // 2. Config file matches
@@ -39,7 +52,7 @@ export class NextJsDetector implements Detector {
           type: EvidenceType.FilePresence,
           source: { type: EvidenceSourceType.Config, name: config },
           message: `Found Next.js configuration file "${config}"`,
-          weight: 0.9,
+          weight: WEIGHTS.CONFIG,
         });
       }
     }
@@ -52,7 +65,7 @@ export class NextJsDetector implements Detector {
           type: EvidenceType.FilePresence,
           source: { type: EvidenceSourceType.File, name: folder },
           message: `Found routing directory "${folder}"`,
-          weight: 0.5,
+          weight: WEIGHTS.ROUTER,
         });
       }
     }
@@ -63,10 +76,15 @@ export class NextJsDetector implements Detector {
         type: EvidenceType.FilePresence,
         source: { type: EvidenceSourceType.File, name: 'next-env.d.ts' },
         message: 'Found "next-env.d.ts" configuration environment file',
-        weight: 0.6,
+        weight: WEIGHTS.ENV,
       });
     }
 
-    return evidence;
+    const result: { evidence: Evidence[]; version?: string } = { evidence };
+    if (version !== undefined) {
+      result.version = version;
+    }
+
+    return result;
   }
 }

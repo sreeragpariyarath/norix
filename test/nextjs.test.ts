@@ -51,10 +51,11 @@ describe('NextJsDetector Heuristics', () => {
       version: '14.2.3',
     });
 
-    const evidence = await detector.detect(context);
+    const { evidence, version } = await detector.detect(context);
     expect(evidence).toHaveLength(1);
     expect(evidence[0].type).toBe('dependency');
     expect(evidence[0].weight).toBe(0.8);
+    expect(version).toBe('14.2.3');
   });
 
   it('should compile evidence for config only', async () => {
@@ -62,7 +63,7 @@ describe('NextJsDetector Heuristics', () => {
       files: ['next.config.js'],
     });
 
-    const evidence = await detector.detect(context);
+    const { evidence } = await detector.detect(context);
     expect(evidence).toHaveLength(1);
     expect(evidence[0].type).toBe('file_presence');
     expect(evidence[0].source.type).toBe('config');
@@ -74,7 +75,7 @@ describe('NextJsDetector Heuristics', () => {
       files: ['app'],
     });
 
-    const evidence = await detector.detect(context);
+    const { evidence } = await detector.detect(context);
     expect(evidence).toHaveLength(1);
     expect(evidence[0].type).toBe('file_presence');
     expect(evidence[0].source.name).toBe('app');
@@ -86,7 +87,7 @@ describe('NextJsDetector Heuristics', () => {
       files: ['src/pages'],
     });
 
-    const evidence = await detector.detect(context);
+    const { evidence } = await detector.detect(context);
     expect(evidence).toHaveLength(1);
     expect(evidence[0].type).toBe('file_presence');
     expect(evidence[0].source.name).toBe('src/pages');
@@ -100,7 +101,7 @@ describe('NextJsDetector Heuristics', () => {
       files: ['next.config.ts', 'app', 'next-env.d.ts'],
     });
 
-    const evidence = await detector.detect(context);
+    const { evidence } = await detector.detect(context);
     // 1 dependency + 1 config + 1 folder + 1 env dts = 4 items of evidence
     expect(evidence).toHaveLength(4);
   });
@@ -111,7 +112,7 @@ describe('NextJsDetector Heuristics', () => {
       files: ['tsconfig.json'],
     });
 
-    const evidence = await detector.detect(context);
+    const { evidence } = await detector.detect(context);
     expect(evidence).toHaveLength(0);
   });
 });

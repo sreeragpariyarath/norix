@@ -18,15 +18,17 @@ class MockDetector implements Detector {
   readonly category = CapabilityCategory.Database;
   readonly role = 'database';
 
-  async detect(): Promise<Evidence[]> {
-    return [
-      {
-        type: 'dependency',
-        source: { type: 'manifest', name: 'package.json' },
-        message: 'Mock evidence',
-        weight: 0.5,
-      },
-    ];
+  async detect(): Promise<{ evidence: Evidence[]; version?: string }> {
+    return {
+      evidence: [
+        {
+          type: 'dependency',
+          source: { type: 'manifest', name: 'package.json' },
+          message: 'Mock evidence',
+          weight: 0.5,
+        },
+      ],
+    };
   }
 }
 
@@ -36,15 +38,17 @@ class AnotherMockDetector implements Detector {
   readonly category = CapabilityCategory.Framework;
   readonly role = 'framework';
 
-  async detect(): Promise<Evidence[]> {
-    return [
-      {
-        type: 'file_presence',
-        source: { type: 'file', name: 'Dockerfile' },
-        message: 'Mock file presence',
-        weight: 0.8,
-      },
-    ];
+  async detect(): Promise<{ evidence: Evidence[]; version?: string }> {
+    return {
+      evidence: [
+        {
+          type: 'file_presence',
+          source: { type: 'file', name: 'Dockerfile' },
+          message: 'Mock file presence',
+          weight: 0.8,
+        },
+      ],
+    };
   }
 }
 
@@ -184,11 +188,11 @@ describe('DetectorRegistry', () => {
 
     expect(results).toHaveLength(2);
     expect(results[0].detectorId).toBe('mock-id');
-    expect(results[0].matched).toBe(true); // 0.5 >= 0.5 -> true
+    expect(results[0].matched).toBe(true); // 0.5 >= 0.3 -> true
     expect(results[0].confidence).toBe(0.5);
 
     expect(results[1].detectorId).toBe('another-mock');
-    expect(results[1].matched).toBe(true); // 0.8 >= 0.5 -> true
+    expect(results[1].matched).toBe(true); // 0.8 >= 0.3 -> true
     expect(results[1].confidence).toBe(0.8);
   });
 
@@ -203,7 +207,7 @@ describe('DetectorRegistry', () => {
       role: 'test',
       detect: async () => {
         executionOrder.push('d1');
-        return [];
+        return { evidence: [] };
       },
     };
 
@@ -214,7 +218,7 @@ describe('DetectorRegistry', () => {
       role: 'test',
       detect: async () => {
         executionOrder.push('d2');
-        return [];
+        return { evidence: [] };
       },
     };
 

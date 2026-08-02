@@ -29,15 +29,9 @@ export class DetectorRegistry {
 
     for (const detector of this.detectors) {
       try {
-        const evidence = await detector.detect(context);
+        const { evidence, version } = await detector.detect(context);
         const confidence = ConfidenceEngine.calculate(evidence);
         const threshold = detector.threshold !== undefined ? detector.threshold : 0.3;
-
-        let version: string | undefined;
-        if (detector.versionQuery) {
-          const v = context.node.getPackageVersion(detector.versionQuery);
-          if (v) version = v;
-        }
 
         const result: DetectionResult = {
           detectorId: detector.id,

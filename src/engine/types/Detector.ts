@@ -16,15 +16,16 @@ export interface Detector {
   readonly role: string;
   /** Optional custom match confidence threshold (defaults to 0.3) */
   readonly threshold?: number;
-  /** Optional npm package name to query version for */
-  readonly versionQuery?: string;
 
   /**
    * Scans the repository context and compiles a list of registered evidence.
    * Does NOT compute final confidence scores.
    *
    * @param context The filesystem reader context
-   * @returns A promise resolving to the list of gathered evidence items
+   * @returns A promise resolving to the list of gathered evidence items and the resolved version
    */
-  detect(context: EvidenceContext): Promise<Evidence[]>;
+  detect(context: EvidenceContext): Promise<{
+    evidence: Evidence[];
+    version?: string;
+  }>;
 }
