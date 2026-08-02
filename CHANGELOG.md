@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.0](https://github.com/sreeragpariyarath/norix/compare/v1.7.0...v1.8.0) (2026-08-02)
+
+
+### Features
+
+* **engine:** migrate Express, Fastify, and NestJS framework detectors to the new execution pipeline ([2c927c9](https://github.com/sreeragpariyarath/norix/commit/2c927c9e9309bd1295bbce087fbd5c27dd1d3773))
+
 ## [1.7.0](https://github.com/sreeragpariyarath/norix/compare/v1.6.0...v1.7.0) (2026-08-02)
 
 
