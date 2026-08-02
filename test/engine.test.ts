@@ -4,7 +4,7 @@ import { DetectorFactory } from '../src/engine/registry/DetectorFactory.js';
 import { DetectorRegistry } from '../src/engine/registry/DetectorRegistry.js';
 import { CapabilityCategory } from '../src/engine/types/Capability.js';
 import { Detector } from '../src/engine/types/Detector.js';
-import { Evidence } from '../src/engine/types/Evidence.js';
+import { Evidence, EvidenceType, EvidenceSourceType } from '../src/engine/types/Evidence.js';
 import { EvidenceContext } from '../src/engine/context/EvidenceContext.js';
 import { NodePackageReader } from '../src/engine/context/readers/NodePackageReader.js';
 import { WorkspaceReader } from '../src/engine/context/readers/WorkspaceReader.js';
@@ -22,8 +22,8 @@ class MockDetector implements Detector {
     return {
       evidence: [
         {
-          type: 'dependency',
-          source: { type: 'manifest', name: 'package.json' },
+          type: EvidenceType.Dependency,
+          source: { type: EvidenceSourceType.Manifest, name: 'package.json' },
           message: 'Mock evidence',
           weight: 0.5,
         },
@@ -42,8 +42,8 @@ class AnotherMockDetector implements Detector {
     return {
       evidence: [
         {
-          type: 'file_presence',
-          source: { type: 'file', name: 'Dockerfile' },
+          type: EvidenceType.FilePresence,
+          source: { type: EvidenceSourceType.File, name: 'Dockerfile' },
           message: 'Mock file presence',
           weight: 0.8,
         },
@@ -60,8 +60,8 @@ describe('ConfidenceEngine', () => {
   it('should correctly calculate bounded probability score for single weight', () => {
     const evidence = [
       {
-        type: 'dependency' as const,
-        source: { type: 'manifest' as const, name: 'package.json' },
+        type: EvidenceType.Dependency,
+        source: { type: EvidenceSourceType.Manifest, name: 'package.json' },
         message: 'test',
         weight: 0.5,
       },
@@ -72,14 +72,14 @@ describe('ConfidenceEngine', () => {
   it('should correctly calculate bounded probability score for multiple weights', () => {
     const evidence = [
       {
-        type: 'dependency' as const,
-        source: { type: 'manifest' as const, name: 'package.json' },
+        type: EvidenceType.Dependency,
+        source: { type: EvidenceSourceType.Manifest, name: 'package.json' },
         message: 'test 1',
         weight: 0.5,
       },
       {
-        type: 'file_presence' as const,
-        source: { type: 'file' as const, name: 'Dockerfile' },
+        type: EvidenceType.FilePresence,
+        source: { type: EvidenceSourceType.File, name: 'Dockerfile' },
         message: 'test 2',
         weight: 0.5,
       },
@@ -91,14 +91,14 @@ describe('ConfidenceEngine', () => {
   it('should round score to two decimal places', () => {
     const evidence = [
       {
-        type: 'dependency' as const,
-        source: { type: 'manifest' as const, name: 'package.json' },
+        type: EvidenceType.Dependency,
+        source: { type: EvidenceSourceType.Manifest, name: 'package.json' },
         message: 'test 1',
         weight: 0.33,
       },
       {
-        type: 'file_presence' as const,
-        source: { type: 'file' as const, name: 'Dockerfile' },
+        type: EvidenceType.FilePresence,
+        source: { type: EvidenceSourceType.File, name: 'Dockerfile' },
         message: 'test 2',
         weight: 0.33,
       },
@@ -110,14 +110,14 @@ describe('ConfidenceEngine', () => {
   it('should clamp weight contributions and cumulative outputs between 0.0 and 1.0', () => {
     const evidence = [
       {
-        type: 'dependency' as const,
-        source: { type: 'manifest' as const, name: 'package.json' },
+        type: EvidenceType.Dependency,
+        source: { type: EvidenceSourceType.Manifest, name: 'package.json' },
         message: 'too high',
         weight: 1.5,
       },
       {
-        type: 'file_presence' as const,
-        source: { type: 'file' as const, name: 'Dockerfile' },
+        type: EvidenceType.FilePresence,
+        source: { type: EvidenceSourceType.File, name: 'Dockerfile' },
         message: 'too low',
         weight: -0.5,
       },
